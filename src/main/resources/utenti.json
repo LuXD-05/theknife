@@ -1,0 +1,10 @@
+{
+  "username": {
+    "firstname": "Marcello",
+    "lastname": "Mordente",
+    "password": "",
+    "birthdate": "1988-03-05",
+    "city": "Varese",
+    "role": "cliente"
+  }
+}
