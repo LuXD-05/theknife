@@ -1,4 +1,6 @@
-package theknife.model;
+package uni.insubria.theknife.model;
+
+
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

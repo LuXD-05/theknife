@@ -1,4 +1,4 @@
-package theknife.model;
+package uni.insubria.theknife.model;
 
 import com.opencsv.bean.CsvBindByName;
 import lombok.EqualsAndHashCode;
