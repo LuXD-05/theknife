@@ -17,7 +17,7 @@ public class SessionController {
     }
 
     public static void setScene(FXMLLoader fxmlLoader) throws IOException {
-        Scene scene = new Scene(fxmlLoader.load(), 1024, 768);
+        Scene scene = new Scene(fxmlLoader.load());
         ((Stage) session.get("stage")).setScene(scene);
     }
 

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RestaurantRepository {
-    private static final String RESTAURANT_CSV = "michelin_my_maps.csv";
+    private static final String RESTAURANT_CSV = "data/michelin_my_maps.csv";
 
     static public List<Restaurant> loadRestaurants() {
         List<Restaurant> restaurants;
