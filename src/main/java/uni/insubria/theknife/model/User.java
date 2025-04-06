@@ -21,6 +21,19 @@ import java.time.LocalDate;
     private LocalDate birthDate;
     private String city;
     private Role role;
+
+    public User(){} //Richiesto da Jackson
+
+    public User(String username, String firstName, String lastName, String password, LocalDate birthDate, String city, Role role){
+        this.username = username;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.birthDate = birthDate;
+        this.city = city;
+        this.role = role;
+    }        
+
 }
 
 
