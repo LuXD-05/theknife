@@ -26,7 +26,7 @@
              <Label fx:id="welcomeText" text="or" />
       <Pane prefHeight="74.0" prefWidth="525.0">
          <children>
-            <TextField layoutX="172.0" prefHeight="27.0" prefWidth="182.0" promptText="Seleziona una città" />
+            <TextField fx:id="cityTextField" layoutX="172.0" prefHeight="27.0" prefWidth="182.0" promptText="Seleziona una città" />
              <Button layoutX="172.0" layoutY="46.0" onAction="#onGuestButtonClick" prefHeight="27.0" prefWidth="182.0" text="Guest" />
          </children>
       </Pane>
