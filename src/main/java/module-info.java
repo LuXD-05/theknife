@@ -5,6 +5,7 @@ module uni.insubria.theknife {
     requires com.opencsv;
     requires com.fasterxml.jackson.databind;
     requires java.sql;
+    requires static spring.security.crypto;
 
     opens uni.insubria.theknife.controller to javafx.fxml;
     
