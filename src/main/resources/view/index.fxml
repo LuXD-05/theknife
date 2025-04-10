@@ -16,8 +16,8 @@
    <children>
       <Pane prefHeight="166.0" prefWidth="525.0">
          <children>
-            <TextField layoutX="172.0" prefHeight="27.0" prefWidth="182.0" promptText="Username" />
-            <TextField layoutX="172.0" layoutY="46.0" prefHeight="27.0" prefWidth="182.0" promptText="Password" />
+            <TextField fx:id="usernameTextField" layoutX="172.0" prefHeight="27.0" prefWidth="182.0" promptText="Username" />
+            <TextField fx:id="passwordTextField" layoutX="172.0" layoutY="46.0" prefHeight="27.0" prefWidth="182.0" promptText="Password" />
             <Button layoutX="172.0" layoutY="93.0" onAction="#onLoginButtonClick" prefHeight="27.0" prefWidth="182.0" text="Login" />
             <Button layoutX="171.0" layoutY="140.0" onAction="#onRegisterButtonClick" prefHeight="27.0" prefWidth="182.0" text="Register" />
          </children>
