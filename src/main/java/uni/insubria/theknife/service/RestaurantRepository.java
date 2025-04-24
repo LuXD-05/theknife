@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -18,26 +19,19 @@ public class RestaurantRepository {
 
     /**
      * Loads the restaurants from the .csv file
+     *
      * @return A list of Restaurant objects
      */
     static public List<Restaurant> loadRestaurants() {
 
-        List<Restaurant> restaurants;
-        // InputStream is = RestaurantRepository.class.getClassLoader().getResourceAsStream(RESTAURANT_CSV); // --> NOT WORKING with getClassLoader() 
-        InputStream is = RestaurantRepository.class.getResourceAsStream(RESTAURANTS_CSV);
-
-        try (Reader reader = new StringReader(new String(is.readAllBytes()))) {
-            
+        try (InputStream is = RestaurantRepository.class.getResourceAsStream(RESTAURANTS_CSV)) {
+            Reader reader = new StringReader(new String(Objects.requireNonNull(is).readAllBytes()));
             CsvToBean<Restaurant> cb = new CsvToBeanBuilder<Restaurant>(reader)
-                .withType(Restaurant.class)
-                .build();
-            restaurants = new ArrayList<>(cb.parse());
-            
+                    .withType(Restaurant.class)
+                    .build();
+            return new ArrayList<>(cb.parse());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        return restaurants;
-
     }
 }

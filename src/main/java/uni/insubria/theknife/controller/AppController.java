@@ -8,6 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.controlsfx.control.textfield.TextFields;
 import uni.insubria.theknife.Main;
 import uni.insubria.theknife.model.Restaurant;
 import uni.insubria.theknife.model.User;
@@ -15,11 +16,13 @@ import uni.insubria.theknife.service.RestaurantRepository;
 import uni.insubria.theknife.service.UserRepository;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class AppController {
+
+    private final List<Restaurant> restaurants = RestaurantRepository.loadRestaurants();
 
     @FXML
     private TextField cityTextField, usernameTextField, passwordTextField;
@@ -68,11 +71,8 @@ public class AppController {
 
         String selectedLocation = cityTextField.getText().trim();
 
-        boolean locationExists = RestaurantRepository.loadRestaurants().stream()
-            .map(r -> r.getLocation().split(",")[0].trim())
-            .distinct()
-            .anyMatch(loc -> loc.equalsIgnoreCase(selectedLocation));
-        
+        boolean locationExists = RestaurantRepository.loadRestaurants().stream().map(r -> r.getLocation().split(",")[0].trim()).distinct().anyMatch(loc -> loc.equalsIgnoreCase(selectedLocation));
+
         if (locationExists) {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/home.fxml"));
             SessionController.setScene(fxmlLoader);
@@ -82,6 +82,11 @@ public class AppController {
             alert.setHeaderText(null);
             alert.setContentText("Nessun ristorante trovato nella location indicata");
             alert.showAndWait();
-        }        
+        }
+    }
+
+    @FXML
+    private void initialize() {
+        TextFields.bindAutoCompletion(cityTextField, restaurants.stream().map(Restaurant::getLocation).collect(Collectors.toSet()).stream().sorted().toList());
     }
 }
