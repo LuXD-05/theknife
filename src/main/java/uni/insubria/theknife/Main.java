@@ -1,7 +1,5 @@
 package uni.insubria.theknife;
 
-import uni.insubria.theknife.controller.AppController;
-
 public class Main {
 
 

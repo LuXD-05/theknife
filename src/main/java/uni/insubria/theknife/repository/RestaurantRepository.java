@@ -1,4 +1,4 @@
-package uni.insubria.theknife.service;
+package uni.insubria.theknife.repository;
 
 import java.io.InputStream;
 import java.io.Reader;
