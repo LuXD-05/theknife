@@ -1,0 +1,31 @@
+.v-box{
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%,
+                                        #18288d 0%,    
+                                        #3663bf 25%, 
+                                        #0f6bae 50%,
+                                        #248bd6 75%, 
+                                        #83b8ff 100%);
+}
+.text-field{
+    -fx-background-color: rgba(255, 255, 255, 0.2); 
+    -fx-border-color: transparent transparent #ffc13d transparent; 
+    -fx-border-width: 0 0 2 0; 
+    -fx-prompt-text-fill: #16161D;
+}
+.date-picker{
+    -fx-background-color: rgba(255, 255, 255, 0.2); 
+    -fx-border-color: transparent transparent #ffc13d transparent; 
+    -fx-border-width: 0 0 2 0; 
+    -fx-prompt-text-fill: #16161D;
+}
+.button{
+    -fx-background-color: rgba(255, 255, 255, 0.6); 
+    -fx-text-fill: #16161D;
+    -fx-cursor: hand;
+}
+.password-field{
+    -fx-background-color: rgba(255, 255, 255, 0.2); 
+    -fx-border-color: transparent transparent #ffc13d transparent; 
+    -fx-border-width: 0 0 2 0; 
+    -fx-prompt-text-fill: #16161D;
+}
