@@ -3,29 +3,29 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="555.0" prefWidth="565.0" spacing="20.0" xmlns="http://javafx.com/javafx/8"
+<VBox alignment="CENTER" prefHeight="Infinity" prefWidth="Infinity" fillWidth="false" spacing="10.0" xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="uni.insubria.theknife.controller.RegisterController" styleClass="v-box"
       stylesheets="@style.css">
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
    </padding>
-   <Pane prefHeight="326.0" prefWidth="560.0">
-      <TextField fx:id="firstNameTextField" layoutX="172.0" layoutY="20.0" prefHeight="27.0" prefWidth="182.0"
+   <VBox alignment="CENTER" spacing="10">
+      <TextField fx:id="firstNameTextField" layoutX="172.0" layoutY="20.0" prefHeight="27.0" prefWidth="300.0"
                  promptText="Nome"/>
-      <TextField fx:id="lastNameTextField" layoutX="172.0" layoutY="57.0" prefHeight="27.0" prefWidth="182.0"
+      <TextField fx:id="lastNameTextField" layoutX="172.0" layoutY="57.0" prefHeight="27.0" prefWidth="300.0"
                  promptText="Cognome"/>
-      <DatePicker fx:id="birthdateTextField" layoutX="172.0" layoutY="94.0" prefHeight="27.0" prefWidth="182.0"
+      <DatePicker fx:id="birthdateTextField" layoutX="172.0" layoutY="94.0" prefHeight="27.0" prefWidth="300.0"
                   promptText="Data di nascita" styleClass="date-picker"/>
 
       <Separator layoutX="163.0" layoutY="140.0" prefWidth="200.0"/>
 
-      <TextField fx:id="usernameTextField" layoutX="171.0" layoutY="160.0" prefHeight="27.0" prefWidth="182.0"
+      <TextField fx:id="usernameTextField" layoutX="171.0" layoutY="160.0" prefHeight="27.0" prefWidth="300.0"
                  promptText="Username"/>
-      <PasswordField fx:id="passwordTextField" layoutX="171.0" layoutY="196.0" prefHeight="27.0" prefWidth="182.0"
+      <PasswordField fx:id="passwordTextField" layoutX="171.0" layoutY="196.0" prefHeight="27.0" prefWidth="300.0"
                  promptText="Password"/>
-      <TextField fx:id="cityTextField" layoutX="172.0" layoutY="232.0" prefHeight="27.0" prefWidth="182.0"
+      <TextField fx:id="cityTextField" layoutX="172.0" layoutY="232.0" prefHeight="27.0" prefWidth="300.0"
                  promptText="Seleziona una città"/>
-      <Button layoutX="172.0" layoutY="278.0" onAction="#onConfirmButtonClick" prefHeight="27.0" prefWidth="182.0"
+      <Button layoutX="172.0" layoutY="278.0" onAction="#onConfirmButtonClick" prefHeight="27.0" prefWidth="300.0"
               text="Registrati"/>
-   </Pane>
+   </VBox>
 </VBox>
