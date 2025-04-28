@@ -8,6 +8,7 @@ import uni.insubria.theknife.model.Restaurant;
 import uni.insubria.theknife.model.User;
 import uni.insubria.theknife.repository.RestaurantRepository;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +28,8 @@ public class SessionService {
     }
 
     public static void setScene(FXMLLoader fxmlLoader) throws IOException {
-        Scene scene = new Scene(fxmlLoader.load());
+        Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        Scene scene = new Scene(fxmlLoader.load(),screenSize.getWidth(),screenSize.getHeight());
         ((Stage) session.get("stage")).setScene(scene);
     }
 

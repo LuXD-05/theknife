@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.controlsfx.control.textfield.TextFields;
 import uni.insubria.theknife.Main;
@@ -24,7 +25,9 @@ public class RegisterController {
     }
 
     @FXML
-    private TextField usernameTextField, firstNameTextField, lastNameTextField, passwordTextField, cityTextField;
+    private TextField usernameTextField, firstNameTextField, lastNameTextField, cityTextField;
+    @FXML
+    private PasswordField passwordTextField;
     @FXML
     private DatePicker birthdateTextField;
 
