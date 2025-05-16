@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class SessionService {
     private static final HashMap<String, Object> session = new HashMap<>();
     @Getter
-    private static final List<Restaurant> restaurants = RestaurantRepository.loadRestaurants();
+    private static final List<Restaurant> restaurants = RestaurantRepository.loadRestaurantsCSV();
     @Getter
     private static final List<String> locations = restaurants.stream().map(Restaurant::getLocation).collect(Collectors.toSet()).stream().sorted().toList();
 

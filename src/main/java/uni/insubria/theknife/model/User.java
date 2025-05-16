@@ -14,6 +14,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,6 +33,8 @@ public class User {
     private LocalDate birthDate;
     private String city;
     private Role role;
+    private List<Review> reviews = new ArrayList<>();
+    private HashSet<Restaurant> restaurants = new HashSet<>();
 }
 
 
