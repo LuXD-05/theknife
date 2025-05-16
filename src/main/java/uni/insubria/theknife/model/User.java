@@ -12,24 +12,25 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Accessors(chain = true)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)public class User {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class User {
     @EqualsAndHashCode.Include
     private String username;
-    private String firstName;
-    private String lastName;
+    private String firstname;
+    private String lastname;
     private String password;
-    private LocalDate birthDate;
+    private LocalDate birthdate;
     private String city;
     private Role role;
 
     public User(){} //Richiesto da Jackson
 
-    public User(String username, String firstName, String lastName, String password, LocalDate birthDate, String city, Role role){
+    public User(String username, String firstname, String lastname, String password, LocalDate birthdate, String city, Role role){
         this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.firstname = firstname;
+        this.lastname = lastname;
         this.password = password;
-        this.birthDate = birthDate;
+        this.birthdate = birthdate;
         this.city = city;
         this.role = role;
     }        

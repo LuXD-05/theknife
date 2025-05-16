@@ -28,7 +28,7 @@ public class Main extends Application {
      * Test method to see if restaurants are being loaded
      */
     private void TestLoadRestaurants() {
-        System.out.println(uni.insubria.theknife.service.RestaurantRepository.loadRestaurants().size() > 0 ? "Ristoranti caricati correttamente" : "Errore caricamento ristoranti");
+        System.out.println(uni.insubria.theknife.service.RestaurantRepository.loadRestaurantsCSV().size() > 0 ? "Ristoranti caricati correttamente" : "Errore caricamento ristoranti");
     }
 
 }

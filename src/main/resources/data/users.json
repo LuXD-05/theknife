@@ -1,10 +1,11 @@
-{
-  "username": {
-    "firstname": "Marcello",
-    "lastname": "Mordente",
-    "password": "",
+[
+  {
+    "username": "a",
+    "password": "a",
+    "firstname": "a",
+    "lastname": "a",
     "birthdate": "1988-03-05",
     "city": "Varese",
     "role": "cliente"
   }
-}
+]

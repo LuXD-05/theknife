@@ -1,9 +1,10 @@
 package uni.insubria.theknife.service;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -24,22 +25,18 @@ public class UserRepository {
      * @return
      * @throws IOException
      */
-    public Map<String, User> loadUsers() throws IOException {
+    public ArrayList<User> loadUsers() throws IOException {
 
-        File file = new File(USERS_JSON);
+        InputStream is = UserRepository.class.getResourceAsStream(USERS_JSON);
 
         // If file doesn't exist --> (creates new json file + returns empty Map)
-        if (!file.exists()) {
-            
-            //TODO - create empty file 'users.json' to its location (to decide, see line 17) ???
-            
-            return new HashMap<>();
-            
+        if (is == null) {
+            return new ArrayList<>();
         }
 
-        try (FileInputStream fis = new FileInputStream(file)) {
+        try {
 
-            return objectMapper.readValue(fis, new TypeReference<Map<String, User>>() {});
+            return objectMapper.readValue(is, new TypeReference<ArrayList<User>>() {});
 
         } catch (Exception e) {
             throw new RuntimeException(e);

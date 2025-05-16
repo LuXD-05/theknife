@@ -9,6 +9,6 @@ module uni.insubria.theknife {
 
     opens uni.insubria.theknife.controller to javafx.fxml;
     
-    exports uni.insubria.theknife.model to com.opencsv;
+    exports uni.insubria.theknife.model to com.opencsv, com.fasterxml.jackson.databind;
     exports uni.insubria.theknife;
 }
