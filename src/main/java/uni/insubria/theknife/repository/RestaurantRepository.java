@@ -2,6 +2,7 @@ package uni.insubria.theknife.repository;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,13 +20,10 @@ public class RestaurantRepository {
     private static final String RESTAURANTS_CSV = "/data/michelin_my_maps.csv";
     private static final String RESTAURANTS_JSON = "/data/restaurants.json";
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
 
-    //TODO from JSON
-    static public List<Restaurant> loadRestaurants() {
-        return new ArrayList<>();
-    }
+
 
     /**
      * @param restaurants
@@ -54,6 +52,20 @@ public class RestaurantRepository {
             return new ArrayList<>(cb.parse());
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Loads the restaurants from the .json file
+     *
+     * @return A list of Restaurant objects
+     */
+    public static List<Restaurant> loadRestaurants() {
+        try {
+            FileInputStream inputStream = new FileInputStream(RESTAURANTS_JSON);
+            return Arrays.asList(objectMapper.readValue(inputStream, Restaurant[].class));
+        } catch (IOException e) {
+            throw new RuntimeException("Errore durante il caricamento delle recensioni", e);
         }
     }
 

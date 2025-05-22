@@ -43,6 +43,17 @@ public class ReviewsRepository {
         fileWriter.write(objectMapper.writeValueAsString(reviews));
         fileWriter.close();
     }
+
+    ///
+    public static List<Review> loadReviews() {
+        try {
+            FileInputStream inputStream = new FileInputStream(REVIEWS_JSON);
+            return Arrays.asList(objectMapper.readValue(inputStream, Review[].class));
+        } catch (IOException e) {
+            throw new RuntimeException("Errore durante il caricamento delle recensioni", e);
+        }
+    }
+
     //TODO
     public static ERROR_CODE addReview(Review review) {
         return ERROR_CODE.NONE;
