@@ -15,6 +15,7 @@ import java.util.List;
 @Accessors(chain = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Restaurant {
+    int id;
     @EqualsAndHashCode.Include
     @CsvBindByName(column = "Name")
     String name;
