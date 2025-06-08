@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox alignment="CENTER" prefHeight="Infinity" prefWidth="Infinity" spacing="10.0"
+      xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="uni.insubria.theknife.controller.RestaurantController"
+      stylesheets="@style.css" styleClass="v-box">
+    <Button fx:id="backButton" onMouseClicked="#handleBack" layoutX="10.0" layoutY="10.0" text="Back"/>
+    <VBox alignment="CENTER" prefHeight="Infinity" prefWidth="600" fillWidth="false" spacing="10.0"
+          xmlns="http://javafx.com/javafx/8"
+          xmlns:fx="http://javafx.com/fxml/1">
+        <Pane prefHeight="525.0" prefWidth="525.0" style="-fx-background-color: #f2f2f2;">
+            <GridPane fx:id="restaurantGridPane" layoutX="10.0" layoutY="60.0" prefWidth="500.0" prefHeight="500.0">
+                <Label text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="label-bold"/>
+                <Label fx:id="nameLabel" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+
+                <Label text="Description:" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="label-bold"/>
+                <Label fx:id="descriptionLabel" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+
+                <Label text="Address:" GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="label-bold"/>
+                <Label fx:id="addressLabel" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+
+                <Label text="Price:" GridPane.columnIndex="0" GridPane.rowIndex="6" styleClass="label-bold"/>
+                <Label fx:id="priceLabel" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+
+                <Label text="Cuisine:" GridPane.columnIndex="0" GridPane.rowIndex="8" styleClass="label-bold"/>
+                <Label fx:id="cuisineLabel" GridPane.columnIndex="0" GridPane.rowIndex="9"/>
+
+                <Label text="Longitude:" GridPane.columnIndex="0" GridPane.rowIndex="10" styleClass="label-bold"/>
+                <Label fx:id="longitudeLabel" GridPane.columnIndex="0" GridPane.rowIndex="11"/>
+
+                <Label text="Latitude:" GridPane.columnIndex="0" GridPane.rowIndex="12" styleClass="label-bold"/>
+                <Label fx:id="latitudeLabel" GridPane.columnIndex="0" GridPane.rowIndex="13"/>
+
+                <Label text="Phone:" GridPane.columnIndex="0" GridPane.rowIndex="14" styleClass="label-bold"/>
+                <Label fx:id="phoneLabel" GridPane.columnIndex="0" GridPane.rowIndex="15"/>
+
+                <Label text="Michelin URL:" GridPane.columnIndex="0" GridPane.rowIndex="16" styleClass="label-bold"/>
+                <Label fx:id="michelinUrlLabel" GridPane.columnIndex="0" GridPane.rowIndex="17"/>
+
+                <Label text="Website URL:" GridPane.columnIndex="0" GridPane.rowIndex="18" styleClass="label-bold"/>
+                <Label fx:id="websiteUrlLabel" GridPane.columnIndex="0" GridPane.rowIndex="19"/>
+
+                <Label text="Award:" GridPane.columnIndex="0" GridPane.rowIndex="20" styleClass="label-bold"/>
+                <Label fx:id="awardLabel" GridPane.columnIndex="0" GridPane.rowIndex="21"/>
+
+                <Label text="Green Star:" GridPane.columnIndex="0" GridPane.rowIndex="22" styleClass="label-bold"/>
+                <Label fx:id="greenStarLabel" GridPane.columnIndex="0" GridPane.rowIndex="23"/>
+
+                <Label text="Facilities:" GridPane.columnIndex="0" GridPane.rowIndex="24" styleClass="label-bold"/>
+                <Label fx:id="facilitiesLabel" GridPane.columnIndex="0" GridPane.rowIndex="25"/>
+            </GridPane>
+        </Pane>
+    </VBox>
+    <VBox alignment="CENTER" prefHeight="525" prefWidth="300" fillWidth="false" spacing="10.0"
+          styleClass="side-box">
+        <Label text="Reviews" styleClass="label-bold"/>
+        <ScrollPane fx:id="reviewScrollPane" prefHeight="450.0" prefWidth="280.0" vbarPolicy="ALWAYS">
+            <VBox fx:id="reviewsVBox">
+                <!-- reviews will be populated here -->
+            </VBox>
+        </ScrollPane>
+        <Button fx:id="addReview" onMouseClicked="#handleAddReview" layoutX="10.0" layoutY="10.0" text="Add review"/>
+    </VBox>
+</HBox>

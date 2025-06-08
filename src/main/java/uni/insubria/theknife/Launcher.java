@@ -14,7 +14,7 @@ public class Launcher extends Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/login.fxml"));
         stage.setTitle("TheKnife");
-        SessionService.setStage(stage, fxmlLoader);
+        SessionService.setStageInSession(stage, fxmlLoader);
     }
 
     public static void main(String[] args) {

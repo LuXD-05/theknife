@@ -38,9 +38,9 @@ public class LoginController {
         }
 
         if (SecurityService.validate(password, user.getPassword())) {
-            SessionService.setUser(user);
+            SessionService.setUserInSession(user);
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/home.fxml"));
-            SessionService.setScene(fxmlLoader);
+            SessionService.setSceneInSession(fxmlLoader);
             return;
         }
         AlertService.alert(AlertType.WARNING, "ATTENZIONE", null, "Password errata");
@@ -49,7 +49,7 @@ public class LoginController {
     @FXML
     protected void onRegisterButtonClick() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/register.fxml"));
-        SessionService.setScene(fxmlLoader);
+        SessionService.setSceneInSession(fxmlLoader);
     }
 
     @FXML
@@ -60,8 +60,9 @@ public class LoginController {
         boolean locationExists = SessionService.getLocations().stream().anyMatch(location -> location.equalsIgnoreCase(selectedLocation));
 
         if (locationExists) {
+            SessionService.setLocation(selectedLocation);
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/home.fxml"));
-            SessionService.setScene(fxmlLoader);
+            SessionService.setSceneInSession(fxmlLoader);
         } else {
             AlertService.alert(AlertType.WARNING, "ATTENZIONE", null, "Nessun ristorante trovato nella location indicata");
         }

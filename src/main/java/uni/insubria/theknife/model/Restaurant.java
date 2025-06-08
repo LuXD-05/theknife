@@ -1,9 +1,7 @@
 package uni.insubria.theknife.model;
 
 import com.opencsv.bean.CsvBindByName;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
@@ -46,8 +44,19 @@ public class Restaurant {
     String facilities;
     @CsvBindByName(column = "Description")
     String description;
+    double distance;
     List<Review> reviews = new ArrayList<>();
     User user = new User();
+
+    @Getter
+    @Setter
+    @Accessors(chain = true)
+    @AllArgsConstructor
+    public static class Coordinate {
+        private float longitude;
+        private float latitude;
+    }
+
 }
 
 

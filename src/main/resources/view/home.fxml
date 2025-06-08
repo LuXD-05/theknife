@@ -4,14 +4,21 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ComboBox?>
 
-<VBox alignment="CENTER" prefHeight="Infinity" prefWidth="Infinity" fillWidth="false" spacing="10.0" xmlns="http://javafx.com/javafx/8"
+<VBox alignment="CENTER" prefHeight="Infinity" prefWidth="Infinity" fillWidth="false" spacing="10.0"
+      xmlns="http://javafx.com/javafx/8"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="uni.insubria.theknife.controller.HomeController"
       stylesheets="@style.css" styleClass="v-box">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
     <Pane prefHeight="523.0" prefWidth="525.0">
-        <Label fx:id="welcomeLabel" layoutX="459.0" layoutY="6.0" text="Welcome" textAlignment="RIGHT"/>
+        <TextField fx:id="selectedLocation" layoutX="172.0" prefHeight="27.0" prefWidth="300.0"
+                   promptText="Seleziona una città"
+                   onKeyReleased="#handleCitySelection"/>
+        <ListView fx:id="restaurantListView" layoutX="10.0" layoutY="60.0" prefWidth="500.0" prefHeight="450.0"
+                  onMouseClicked="#handleRestaurantSelection"/>
     </Pane>
 </VBox>
