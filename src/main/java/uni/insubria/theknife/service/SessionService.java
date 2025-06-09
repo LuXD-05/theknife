@@ -67,4 +67,11 @@ public class SessionService {
     public static void setLocation(String selectedLocation) {
         session.put(LOCATION_KEY, selectedLocation);
     }
+
+    public static void clearUserSession() {
+        // Clear user data
+        session.remove(USER_KEY);
+        session.remove(RESTAURANT_KEY);
+        session.remove(LOCATION_KEY);
+    }
 }

@@ -33,8 +33,10 @@ public class ReviewsRepository {
         NONE
     }
 
-    //TODO
     public static List<Review> reviewsByRestaurant(Restaurant restaurant) {
+        if (restaurant != null && restaurant.getReviews() != null) {
+            return new ArrayList<>(restaurant.getReviews());
+        }
         return new ArrayList<>();
     }
 
@@ -54,9 +56,25 @@ public class ReviewsRepository {
         }
     }
 
-    //TODO
     public static ERROR_CODE addReview(Review review) {
-        return ERROR_CODE.NONE;
+        try {
+            // Add review to restaurant's review list if it doesn't exist already
+            if (review.getRestaurant().getReviews() == null) {
+                review.getRestaurant().setReviews(new ArrayList<>());
+            }
+            review.getRestaurant().getReviews().add(review);
+            
+            // Add review to user's review list
+            if (review.getUser().getReviews() == null) {
+                review.getUser().setReviews(new ArrayList<>());
+            }
+            review.getUser().getReviews().add(review);
+            
+            return ERROR_CODE.NONE;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ERROR_CODE.SERVICE_ERROR;
+        }
     }
 
     //TODO

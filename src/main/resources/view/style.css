@@ -1,32 +1,36 @@
-.v-box{
+.v-box {
     -fx-background-color: linear-gradient(from 0% 0% to 100% 100%,
-                                        #18288d 0%,    
-                                        #3663bf 25%, 
-                                        #0f6bae 50%,
-                                        #248bd6 75%, 
-                                        #43b8ff 100%);
+    #18288d 0%,
+    #3663bf 25%,
+    #0f6bae 50%,
+    #248bd6 75%,
+    #43b8ff 100%);
 }
-.text-field{
-    -fx-background-color: rgba(255, 255, 255, 0.2); 
-    -fx-border-color: transparent transparent #ffc13d transparent; 
-    -fx-border-width: 0 0 2 0; 
+
+.text-field {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-border-color: transparent transparent #ffc13d transparent;
+    -fx-border-width: 0 0 2 0;
     -fx-prompt-text-fill: #16161D;
 }
-.date-picker{
-    -fx-background-color: rgba(255, 255, 255, 0.1); 
+
+.date-picker {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
     /* -fx-border-color: transparent transparent #ffc13d transparent; 
     -fx-border-width: 0 0 2 0;  */
     -fx-prompt-text-fill: #16161D;
 }
-.button{
-    -fx-background-color: rgba(255, 255, 255, 0.6); 
+
+.button {
+    -fx-background-color: rgba(255, 255, 255, 0.6);
     -fx-text-fill: #16161D;
     -fx-cursor: hand;
 }
-.password-field{
-    -fx-background-color: rgba(255, 255, 255, 0.2); 
-    -fx-border-color: transparent transparent #ffc13d transparent; 
-    -fx-border-width: 0 0 2 0; 
+
+.password-field {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-border-color: transparent transparent #ffc13d transparent;
+    -fx-border-width: 0 0 2 0;
     -fx-prompt-text-fill: #16161D;
 }
 
@@ -34,5 +38,24 @@
     -fx-font-weight: bold;
 }
 
-.side-box {
+.section-header {
+}
+.review-user {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.review-stars {
+    -fx-text-fill: gold;
+    -fx-font-size: 14px;
+}
+
+.review-content {
+    -fx-font-size: 13px;
+}
+
+.review-answer {
+    -fx-font-size: 13px;
+    -fx-font-style: italic;
+    -fx-padding: 5 0 0 15;
 }

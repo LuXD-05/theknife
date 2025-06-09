@@ -55,6 +55,8 @@ public class RegisterController {
             case SERVICE_ERROR -> AlertService.alert(AlertType.ERROR, "SERVICE ERROR", null, "Impossibile inserire utente.");
             default -> {
                 FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/home.fxml"));
+                SessionService.setUserInSession(user);
+                SessionService.setLocation(cityTextField.getText());
                 SessionService.setSceneInSession(fxmlLoader);
             }
         }

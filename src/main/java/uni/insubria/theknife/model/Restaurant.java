@@ -7,12 +7,15 @@ import lombok.experimental.Accessors;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
 @Accessors(chain = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Restaurant {
+    @EqualsAndHashCode.Include
+    private int id;
     @EqualsAndHashCode.Include
     @CsvBindByName(column = "Name")
     String name;
@@ -48,6 +51,10 @@ public class Restaurant {
     List<Review> reviews = new ArrayList<>();
     User user = new User();
 
+    public Restaurant() {
+        this.id = Objects.hash(name, longitude, latitude);
+    }
+
     @Getter
     @Setter
     @Accessors(chain = true)
@@ -58,8 +65,3 @@ public class Restaurant {
     }
 
 }
-
-
-
-
-

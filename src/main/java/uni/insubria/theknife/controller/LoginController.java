@@ -38,8 +38,9 @@ public class LoginController {
         }
 
         if (SecurityService.validate(password, user.getPassword())) {
-            SessionService.setUserInSession(user);
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/home.fxml"));
+            SessionService.setUserInSession(user);
+            SessionService.setLocation(user.getCity());
             SessionService.setSceneInSession(fxmlLoader);
             return;
         }
