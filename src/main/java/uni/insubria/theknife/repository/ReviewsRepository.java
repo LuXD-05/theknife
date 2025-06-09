@@ -14,6 +14,10 @@ import java.util.*;
 
 public class ReviewsRepository {
 
+    //TODO GITHUB TASK #7
+    //finalise repository and pre-load some review for restaurants (demo purposes)
+    //TODO GITHUB TASK #10
+    //add/edit/delete review
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
 

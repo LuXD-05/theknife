@@ -28,6 +28,8 @@ public class SessionService {
     @Getter
     private static final List<String> locations = restaurants.stream().map(Restaurant::getLocation).collect(Collectors.toSet()).stream().sorted().toList();
 
+    //TODO
+    //GITHUB TASK #5 add list of cousine, price, facilities, awars, greenstar
 
     public static void setStageInSession(Stage stage, FXMLLoader fxmlLoader) throws IOException {
         session.put(STAGE_KEY, stage);

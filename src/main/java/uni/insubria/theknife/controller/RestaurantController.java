@@ -29,6 +29,10 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.HBox;
 
 public class RestaurantController {
+    //TODO
+    //GITHUB TASK #12 - #13 - #14
+    //Risposta recensioni + Report riepilogo recensioni + dettaglio recensioni
+
     private static final String LOGIN_PROMPT = "Please login to add a review";
     private static final String MISSING_INFO_TITLE = "Missing Information";
     private static final String REVIEW_VALIDATION_MESSAGE = "Please provide both a review and a rating.";

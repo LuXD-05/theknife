@@ -20,7 +20,10 @@ import uni.insubria.theknife.model.Review;
  * This class provides methods to interact with the repository of Restaurant objects.
  */
 public class RestaurantRepository {
-
+    //TODO GITHUB TASK #9
+    //Aggiungere/Modificare/Eliminare ristoranti preferiti
+    //TODO GITHUB TASK #11
+    //transform .CSV to JSON and add/edit/delete review
     /**
      * Adds a new restaurant to the repository if it does not already exist.
      *
