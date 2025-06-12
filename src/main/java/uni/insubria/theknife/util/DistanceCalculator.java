@@ -6,11 +6,18 @@ import uni.insubria.theknife.model.Restaurant;
 /**
  * Utility class for calculating geographical distances between locations.
  * Uses the Haversine formula to calculate the great-circle distance between two points on a sphere.
+ * <p>
+ * This class is annotated with Lombok's @UtilityClass which automatically makes the class final,
+ * adds a private constructor, and makes all methods static.
+ * </p>
  */
 @UtilityClass
 public class DistanceCalculator {
 
-    private static final double EARTH_RADIUS_KM = 6371.0; // Earth's radius in kilometers
+    /**
+     * Earth's radius in kilometers, used for distance calculations.
+     */
+    private static final double EARTH_RADIUS_KM = 6371.0;
 
     /**
      * Calculates the distance between a restaurant and a reference coordinate in kilometers.
@@ -32,11 +39,17 @@ public class DistanceCalculator {
         double a = calculateHaversineFormula(startLat, startLong, endLat, endLong);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        return Math.round(EARTH_RADIUS_KM * c); // Round to nearest kilometer
+        return Math.round(EARTH_RADIUS_KM * c);
     }
 
     /**
      * Calculates the Haversine formula component for spherical distance calculation.
+     *
+     * @param startLat The latitude of the starting point in radians
+     * @param startLong The longitude of the starting point in radians
+     * @param endLat The latitude of the ending point in radians
+     * @param endLong The longitude of the ending point in radians
+     * @return The Haversine formula component (a value between 0 and 1)
      */
     private static double calculateHaversineFormula(double startLat, double startLong,
                                                     double endLat, double endLong) {

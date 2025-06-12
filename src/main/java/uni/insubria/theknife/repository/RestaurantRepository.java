@@ -13,16 +13,46 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import uni.insubria.theknife.model.Restaurant;
 
 /**
- * This class provides methods to interact with the repository of Restaurant objects.
+ * Repository for managing restaurant data in the TheKnife application.
+ * <p>
+ * This class provides methods to interact with the repository of Restaurant objects,
+ * including loading restaurants from CSV and JSON files, and performing CRUD operations
+ * (Create, Read, Update, Delete) on restaurant data.
+ * </p>
+ * <p>
+ * The repository handles data persistence and serves as the data access layer
+ * for restaurant-related operations in the application.
+ * </p>
  */
 public class RestaurantRepository {
+    /**
+     * Default constructor for the RestaurantRepository class.
+     * <p>
+     * This constructor is not meant to be used directly as this class only provides
+     * static methods. The class is not designed to be instantiated.
+     * </p>
+     */
+    public RestaurantRepository() {
+        // Default constructor - not meant to be used
+    }
     //TODO GITHUB TASK #9
     //Aggiungere/Modificare/Eliminare ristoranti preferiti
     //TODO GITHUB TASK #11
     //transform .CSV to JSON and add/edit/delete review
+
+    /**
+     * Path to the CSV file containing the initial restaurant data.
+     */
     private static final String RESTAURANTS_CSV = "data/michelin_my_maps.csv";
+
+    /**
+     * Path to the JSON file used for storing and retrieving restaurant data.
+     */
     private static final String RESTAURANTS_JSON = "data/restaurants.json";
 
+    /**
+     * Jackson ObjectMapper instance used for JSON serialization and deserialization.
+     */
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -152,9 +182,23 @@ public class RestaurantRepository {
         return ERROR_CODE.SERVICE_ERROR;
     }
 
+    /**
+     * Enumeration of possible error codes returned by repository operations.
+     */
     public enum ERROR_CODE {
+        /**
+         * Indicates that the operation failed because the entity already exists.
+         */
         DUPLICATED,
+
+        /**
+         * Indicates that a service-level error occurred during the operation.
+         */
         SERVICE_ERROR,
+
+        /**
+         * Indicates that the operation completed successfully with no errors.
+         */
         NONE
     }
 }
