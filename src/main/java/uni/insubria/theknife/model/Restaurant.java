@@ -15,8 +15,7 @@ import java.util.Objects;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Restaurant {
     @EqualsAndHashCode.Include
-    private int id;
-    @EqualsAndHashCode.Include
+    String id;
     @CsvBindByName(column = "Name")
     String name;
     @CsvBindByName(column = "Address")
@@ -27,12 +26,10 @@ public class Restaurant {
     String price;
     @CsvBindByName(column = "Cuisine")
     String cuisine;
-    @EqualsAndHashCode.Include
     @CsvBindByName(column = "Longitude")
-    float longitude;
-    @EqualsAndHashCode.Include
+    Float longitude;
     @CsvBindByName(column = "Latitude")
-    float latitude;
+    Float latitude;
     @CsvBindByName(column = "PhoneNumber")
     String phone;
     @CsvBindByName(column = "Url")
@@ -42,26 +39,22 @@ public class Restaurant {
     @CsvBindByName(column = "Award")
     String award;
     @CsvBindByName(column = "GreenStar")
-    int greenStar;
+    Integer greenStar;
     @CsvBindByName(column = "FacilitiesAndServices")
     String facilities;
     @CsvBindByName(column = "Description")
     String description;
-    double distance;
+    Double distance;
     List<Review> reviews = new ArrayList<>();
-    User user = new User();
-
-    public Restaurant() {
-        this.id = Objects.hash(name, longitude, latitude);
-    }
+    User user = null;
 
     @Getter
     @Setter
     @Accessors(chain = true)
     @AllArgsConstructor
     public static class Coordinate {
-        private float longitude;
-        private float latitude;
+        private Float longitude;
+        private Float latitude;
     }
 
 }

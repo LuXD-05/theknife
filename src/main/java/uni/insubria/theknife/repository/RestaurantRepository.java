@@ -1,20 +1,16 @@
 package uni.insubria.theknife.repository;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
 import uni.insubria.theknife.model.Restaurant;
-import uni.insubria.theknife.model.Review;
 
 /**
  * This class provides methods to interact with the repository of Restaurant objects.
@@ -24,48 +20,42 @@ public class RestaurantRepository {
     //Aggiungere/Modificare/Eliminare ristoranti preferiti
     //TODO GITHUB TASK #11
     //transform .CSV to JSON and add/edit/delete review
+    private static final String RESTAURANTS_CSV = "/data/michelin_my_maps.csv";
+    private static final String RESTAURANTS_JSON;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    static {
+        if (ReviewsRepository.class.getClassLoader().getResource("data/restaurants.json") != null) {
+            RESTAURANTS_JSON = Objects.requireNonNull(ReviewsRepository.class.getClassLoader().getResource("data/restaurants.json")).getFile();
+        } else {
+            RESTAURANTS_JSON = new File(Objects.requireNonNull(ReviewsRepository.class.getClassLoader().getResource("data")).getFile(), "restaurants.json").getAbsolutePath();
+        }
+    }
+
     /**
      * Adds a new restaurant to the repository if it does not already exist.
      *
      * @param restaurant the restaurant to add
      * @return ERROR_CODE an error code indicating the result of the operation:
-     *                   - DUPLICATED if the restaurant already exists in the repository
-     *                   - SERVICE_ERROR if an error occurs during saving the repository
-     *                   - NONE if the restaurant is successfully added
+     * - DUPLICATED if the restaurant already exists in the repository
+     * - SERVICE_ERROR if an error occurs during saving the repository
+     * - NONE if the restaurant is successfully added
      */
     public static ERROR_CODE addRestaurant(Restaurant restaurant) {
-        List<Restaurant> restaurants = loadRestaurants();
-        for (Restaurant existingRestaurant : restaurants) {
-            if (existingRestaurant.equals(restaurant)) {
-                return ERROR_CODE.DUPLICATED;
-            }
+        Map<String, Restaurant> restaurants = loadRestaurants();
+        String id = String.valueOf(Objects.hash(restaurant.getName(), restaurant.getLatitude(), restaurant.getLongitude()));
+        if (restaurants.containsKey(id)) {
+            return ERROR_CODE.DUPLICATED;
         }
-        restaurants.add(restaurant);
+        restaurants.put(id, restaurant.setId(id));
         try {
-            saveRestaurants(restaurants.stream().collect(Collectors.toMap(Restaurant::getName, Function.identity())));
+            saveRestaurants(restaurants);
         } catch (IOException e) {
             return ERROR_CODE.SERVICE_ERROR;
         }
         return ERROR_CODE.NONE;
     }
-
-    /**
-     * Path to the CSV file containing restaurant data.
-     * Note that the path should start with '/', otherwise the InputStream will be null.
-     */
-    private static final String RESTAURANTS_CSV = "/data/michelin_my_maps.csv";
-    /**
-     * Represents the file path of the JSON data for restaurants.
-     */
-    private static final String RESTAURANTS_JSON = "/data/restaurants.json";
-
-    /**
-     * Private static final instance of ObjectMapper used for JSON serialization and deserialization.
-     */
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
-
-
 
     /**
      * Saves the provided map of restaurants to a JSON file.
@@ -74,10 +64,6 @@ public class RestaurantRepository {
      * @throws IOException if an I/O error occurs during file writing
      */
     public static void saveRestaurants(Map<String, Restaurant> restaurants) throws IOException {
-
-        //TODO - Verify if the path to the file (all folders) exist --> IF NOT, create make them
-
-        // Writes the json file
         objectMapper.writeValue(new File(RESTAURANTS_JSON), restaurants);
 
     }
@@ -102,12 +88,30 @@ public class RestaurantRepository {
     /**
      * Loads the restaurants from the .json file
      *
-     * @return A list of Restaurant objects representing the restaurants data loaded from JSON file
+     * @return A list of Restaurant objects representing the restaurant data loaded from the JSON file
      */
-    public static List<Restaurant> loadRestaurants() {
+    public static Map<String, Restaurant> loadRestaurants() {
         try {
-            FileInputStream inputStream = new FileInputStream(RESTAURANTS_JSON);
-            return Arrays.asList(objectMapper.readValue(inputStream, Restaurant[].class));
+            File file = new File(RESTAURANTS_JSON);
+            if (!file.exists()) {
+                Map<String, Restaurant> restaurants = loadRestaurantsCSV().stream().map(restaurant -> {
+                    String id = String.valueOf(Objects.hash(restaurant.getName(), restaurant.getLatitude(), restaurant.getLongitude()));
+                    return restaurant
+                            .setId(id)
+                            .setReviews(ReviewsRepository.reviewsByRestaurant(restaurant));
+
+                }).collect(Collectors.toMap(Restaurant::getId, Function.identity()));
+                saveRestaurants(restaurants);
+                return restaurants;
+            }
+            Map<String, Restaurant> restaurants = objectMapper.readValue(new FileInputStream(file), new TypeReference<>() {
+            });
+            restaurants.keySet().forEach(key -> {
+                Restaurant restaurant = objectMapper.convertValue(restaurants.get(key), Restaurant.class);
+                restaurant.setReviews(ReviewsRepository.reviewsByRestaurant(restaurant));
+                restaurants.put(key, restaurant);
+            });
+            return restaurants;
         } catch (IOException e) {
             throw new RuntimeException("Errore durante il caricamento delle recensioni", e);
         }
@@ -121,17 +125,15 @@ public class RestaurantRepository {
      * @return ERROR_CODE.NONE if the restaurant was successfully edited, ERROR_CODE.SERVICE_ERROR if an error occurred.
      */
     public static ERROR_CODE editRestaurant(Restaurant restaurant) {
-        List<Restaurant> restaurants = loadRestaurants();
-        for (int i = 0; i < restaurants.size(); i++) {
-            if (restaurants.get(i).equals(restaurant)) {
-                restaurants.set(i, restaurant);
-                try {
-                    saveRestaurants(restaurants.stream().collect(Collectors.toMap(Restaurant::getName, Function.identity())));
-                } catch (IOException e) {
-                    return ERROR_CODE.SERVICE_ERROR;
-                }
-        return ERROR_CODE.NONE;
-    }
+        Map<String, Restaurant> restaurants = loadRestaurants();
+        if (restaurants.containsKey(restaurant.getId())) {
+            restaurants.put(restaurant.getId(), restaurant);
+            try {
+                saveRestaurants(restaurants);
+            } catch (IOException e) {
+                return ERROR_CODE.SERVICE_ERROR;
+            }
+            return ERROR_CODE.NONE;
         }
         return ERROR_CODE.SERVICE_ERROR;
     }
@@ -146,18 +148,15 @@ public class RestaurantRepository {
      * - NONE if the operation was successful
      */
     public static ERROR_CODE deleteRestaurant(Restaurant restaurant) {
-        List<Restaurant> restaurants = loadRestaurants();
-        boolean removed = restaurants.removeIf(existingRestaurant -> existingRestaurant.equals(restaurant));
-
-        if (removed) {
+        Map<String, Restaurant> restaurants = loadRestaurants();
+        if (restaurants.remove(restaurant.getId()) != null) {
             try {
-                saveRestaurants(restaurants.stream().collect(Collectors.toMap(Restaurant::getName, Function.identity())));
+                saveRestaurants(restaurants);
             } catch (IOException e) {
                 return ERROR_CODE.SERVICE_ERROR;
             }
-        return ERROR_CODE.NONE;
-    }
-
+            return ERROR_CODE.NONE;
+        }
         return ERROR_CODE.SERVICE_ERROR;
     }
 

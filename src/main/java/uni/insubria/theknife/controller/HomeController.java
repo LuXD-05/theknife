@@ -10,6 +10,7 @@ import javafx.scene.input.MouseEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.textfield.TextFields;
 import uni.insubria.theknife.model.Restaurant;
+import uni.insubria.theknife.model.Role;
 import uni.insubria.theknife.model.User;
 import uni.insubria.theknife.service.SessionService;
 import uni.insubria.theknife.util.DistanceCalculator;
@@ -68,8 +69,8 @@ public class HomeController {
 
     private List<Restaurant> getFilteredRestaurants(Restaurant.Coordinate referenceCoordinates) {
         return SessionService.getRestaurants().stream()
+                .filter(restaurant -> !Role.RISTORATORE.equals(SessionService.getUserFromSession().getRole()) || SessionService.getUserFromSession().getRestaurants().contains(restaurant))
                 .peek(restaurant -> updateRestaurantDistance(restaurant, referenceCoordinates))
-                .filter(restaurant -> restaurant.getDistance() < MAX_DISTANCE_KM)
                 .sorted(Comparator.comparingDouble(Restaurant::getDistance))
                 .collect(Collectors.toList());
     }

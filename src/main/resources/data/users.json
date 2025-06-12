@@ -1,1 +1,32 @@
-{}
+{
+  "mmordente-ristoratore": {
+    "username": "mmordente-ristoratore",
+    "firstName": "Marcello",
+    "lastName": "Mordente",
+    "password": "$2a$10$RQTcwtH79uBXdpGcyZYm1ON6U17eKMIGAPg3ExU/Yn8mpFwX1Bvwm",
+    "birthDate": [
+      1988,
+      5,
+      3
+    ],
+    "city": "Varese, Italy",
+    "role": "RISTORATORE",
+    "restaurants": [{
+      "id": "1436004267"
+    }]
+  },
+  "mmordente-cliente": {
+    "username": "mmordente-cliente",
+    "firstName": "Marcello",
+    "lastName": "Mordente",
+    "password": "$2a$10$MPIABb4FATQ9kgMYpTjvX.E6/KJFZjCxyUVY1gZJJ2GbphConADuW",
+    "birthDate": [
+      1988,
+      5,
+      3
+    ],
+    "city": "Varese, Italy",
+    "role": "CLIENTE",
+    "restaurants": []
+  }
+}

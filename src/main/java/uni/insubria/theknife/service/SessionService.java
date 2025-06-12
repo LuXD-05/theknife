@@ -23,7 +23,7 @@ public class SessionService {
     private static final String RESTAURANT_KEY = "restaurant";
 
     @Getter
-    private static final List<Restaurant> restaurants = RestaurantRepository.loadRestaurantsCSV();
+    private static final List<Restaurant> restaurants = RestaurantRepository.loadRestaurants().values().stream().toList();
 
     @Getter
     private static final List<String> locations = restaurants.stream().map(Restaurant::getLocation).collect(Collectors.toSet()).stream().sorted().toList();

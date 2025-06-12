@@ -1,1 +1,24 @@
-{}
+{
+  "1931659598" : {
+    "id" : "1931659598",
+    "user" : {
+      "username" : "mmordente-cliente"
+    },
+    "restaurant" : {
+      "id" : "811930234"
+    },
+    "content" : "Bello",
+    "stars" : 2
+  },
+  "270362393" : {
+    "id" : "270362393",
+    "user" : {
+      "username" : "mmordente-cliente"
+    },
+    "restaurant" : {
+      "id" : "-220198052"
+    },
+    "content" : "Molto bello",
+    "stars" : 5
+  }
+}

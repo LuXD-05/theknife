@@ -1,14 +1,18 @@
 package uni.insubria.theknife.model;
 
-import com.opencsv.bean.CsvBindByName;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Getter
 @Setter
 @Accessors(chain = true)
+@NoArgsConstructor
 public class Review {
+    @EqualsAndHashCode.Include
+    String id;
     User user;
     Restaurant restaurant;
     String content;

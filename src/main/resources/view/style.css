@@ -36,6 +36,7 @@
 
 .label-bold {
     -fx-font-weight: bold;
+    -fx-min-width: 100px;
 }
 
 .section-header {

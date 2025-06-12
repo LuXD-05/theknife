@@ -33,7 +33,6 @@ public class User {
     private LocalDate birthDate;
     private String city;
     private Role role;
-    private List<Review> reviews = new ArrayList<>();
     private HashSet<Restaurant> restaurants = new HashSet<>();
 }
 
