@@ -69,7 +69,7 @@ public class HomeController {
 
     private List<Restaurant> getFilteredRestaurants(Restaurant.Coordinate referenceCoordinates) {
         return SessionService.getRestaurants().stream()
-                .filter(restaurant -> !Role.RISTORATORE.equals(SessionService.getUserFromSession().getRole()) || SessionService.getUserFromSession().getRestaurants().contains(restaurant))
+                .filter(restaurant -> SessionService.getUserFromSession() == null || !Role.RISTORATORE.equals(SessionService.getUserFromSession().getRole()) || SessionService.getUserFromSession().getRestaurants().contains(restaurant))
                 .peek(restaurant -> updateRestaurantDistance(restaurant, referenceCoordinates))
                 .sorted(Comparator.comparingDouble(Restaurant::getDistance))
                 .collect(Collectors.toList());
