@@ -22,15 +22,7 @@ public class ReviewsRepository {
     private static final ObjectMapper objectMapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL).setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
     private static final ObjectWriter objectWriter = objectMapper.writer().withDefaultPrettyPrinter();
 
-    private static final String REVIEWS_JSON;
-
-    static {
-        if (ReviewsRepository.class.getClassLoader().getResource("data/reviews.json") != null) {
-            REVIEWS_JSON = Objects.requireNonNull(ReviewsRepository.class.getClassLoader().getResource("data/reviews.json")).getFile();
-        } else {
-            REVIEWS_JSON = new File(Objects.requireNonNull(ReviewsRepository.class.getClassLoader().getResource("data")).getFile(), "reviews.json").getAbsolutePath();
-        }
-    }
+    private static final String REVIEWS_JSON = "data/reviews.json";
 
     public enum ERROR_CODE {
         DUPLICATED,

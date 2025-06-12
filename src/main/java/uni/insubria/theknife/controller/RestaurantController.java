@@ -40,7 +40,7 @@ public class RestaurantController {
     @FXML
     private ComboBox<Integer> editRatingSelector;
     private Review currentlyEditingReview;
-    
+
     //TODO
     //GITHUB TASK #12 - #13 - #14
     //Risposta recensioni + Report riepilogo recensioni + dettaglio recensioni
@@ -96,8 +96,7 @@ public class RestaurantController {
         }
         setupReviewListView(restaurant.getReviews());
         reviewsListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && SessionService.getUserFromSession() != null
-                    && SessionService.getUserFromSession().getRole() == Role.RISTORATORE) {
+            if (newVal != null && SessionService.getUserFromSession() != null && SessionService.getUserFromSession().getRole() == Role.RISTORATORE) {
                 selectedReview = newVal;
             }
         });
@@ -129,9 +128,7 @@ public class RestaurantController {
 
     private void initializeRatingSelector() {
         if (ratingSelector != null) {
-            ratingSelector.setItems(FXCollections.observableArrayList(
-                    "1 star", "2 stars", "3 stars", "4 stars", "5 stars"
-            ));
+            ratingSelector.setItems(FXCollections.observableArrayList("1 star", "2 stars", "3 stars", "4 stars", "5 stars"));
         }
     }
 
@@ -154,8 +151,7 @@ public class RestaurantController {
         }
 
         // Check if user has already reviewed this restaurant
-        boolean hasExistingReview = restaurant.getReviews().stream()
-                .anyMatch(review -> review.getUser().getUsername().equals(user.getUsername()));
+        boolean hasExistingReview = restaurant.getReviews().stream().anyMatch(review -> review.getUser().getUsername().equals(user.getUsername()));
 
         if (hasExistingReview) {
             showAlert(MISSING_INFO_TITLE, "You have already reviewed this restaurant.");
@@ -236,12 +232,7 @@ public class RestaurantController {
     private Review createReview(User user, Restaurant restaurant) {
         String ratingText = ratingSelector.getValue();
         int stars = Character.getNumericValue(ratingText.charAt(0));
-        return new Review()
-                .setId(String.valueOf(Objects.hash(user.getUsername(), restaurant.getId())))
-                .setUser(user)
-                .setRestaurant(restaurant)
-                .setContent(reviewContent.getText())
-                .setStars(stars);
+        return new Review().setId(String.valueOf(Objects.hash(user.getUsername(), restaurant.getId()))).setUser(user).setRestaurant(restaurant).setContent(reviewContent.getText()).setStars(stars);
     }
 
     private void clearReviewInputs() {
@@ -280,168 +271,164 @@ public class RestaurantController {
         }
     }
 
-private void updateReviewSummary(List<Review> reviews) {
-    int totalReviews = reviews.size();
-    double averageRating = reviews.stream()
-            .mapToInt(Review::getStars)
-            .average()
-            .orElse(0.0);
+    private void updateReviewSummary(List<Review> reviews) {
+        int totalReviews = reviews.size();
+        double averageRating = reviews.stream().mapToInt(Review::getStars).average().orElse(0.0);
 
-    totalReviewsLabel.setText(String.valueOf(totalReviews));
-    averageRatingLabel.setText(String.format("%.1f ★", averageRating));
-}
-
-private void setupReviewListView(List<Review> reviews) {
-    if (reviews == null) {
-        reviews = new ArrayList<>();
+        totalReviewsLabel.setText(String.valueOf(totalReviews));
+        averageRatingLabel.setText(String.format("%.1f ★", averageRating));
     }
-    reviewObservableList.setAll(reviews);
-    reviewsListView.setItems(reviewObservableList);
-    reviewsListView.setCellFactory(listView -> new ReviewCell(this));
-    reviewsListView.refresh();
-    
-    // Update the summary when reviews change
-    updateReviewSummary(reviews);
-}
+
+    private void setupReviewListView(List<Review> reviews) {
+        if (reviews == null) {
+            reviews = new ArrayList<>();
+        }
+        reviewObservableList.setAll(reviews);
+        reviewsListView.setItems(reviewObservableList);
+        reviewsListView.setCellFactory(listView -> new ReviewCell(this));
+        reviewsListView.refresh();
+
+        // Update the summary when reviews change
+        updateReviewSummary(reviews);
+    }
 
     public void handleSaveEditedReview(ActionEvent actionEvent) {
         SessionService.getRestaurantFromSession().ifPresent(this::handleSaveEditedReview);
     }
 
     public class ReviewCell extends ListCell<Review> {
-    private final VBox contentBox;
-    private final HBox actionBox;
-        private final Button deleteButton;
-    private final Label userLabel;
-    private final Label starsLabel;
-    private final Label contentLabel;
-    private final HBox answerBoxRow;
-    private final Label answerLabelPrefix;
-    private final Label answerLabel;
-    private final TextField answerField;
-    private final VBox answerBox;
+        private final VBox contentBox;
+        private final HBox actionBox;
+        private final Label userLabel;
+        private final Label starsLabel;
+        private final Label contentLabel;
+        private final HBox answerBoxRow;
+        private final Label answerLabelPrefix;
+        private final Label answerLabel;
+        private final TextField answerField;
+        private final VBox answerBox;
 
-    public ReviewCell(RestaurantController controller) {
-        // Initialize components
-        contentBox = new VBox(8); // 8px spacing
-        contentBox.setPadding(new Insets(10));
-        contentBox.setStyle("-fx-background-color: rgba(255, 255, 255, 0.1); -fx-background-radius: 5;");
+        public ReviewCell(RestaurantController controller) {
+            // Initialize components
+            contentBox = new VBox(8); // 8px spacing
+            contentBox.setPadding(new Insets(10));
+            contentBox.setStyle("-fx-background-color: rgba(255, 255, 255, 0.1); -fx-background-radius: 5;");
 
-        HBox headerBox = new HBox(10);
+            HBox headerBox = new HBox(10);
 
-        userLabel = new Label();
-        userLabel.getStyleClass().add("review-user");
+            userLabel = new Label();
+            userLabel.getStyleClass().add("review-user");
 
-        starsLabel = new Label();
-        starsLabel.getStyleClass().add("review-stars");
+            starsLabel = new Label();
+            starsLabel.getStyleClass().add("review-stars");
 
-        headerBox.getChildren().addAll(userLabel, starsLabel);
+            headerBox.getChildren().addAll(userLabel, starsLabel);
 
-        contentLabel = new Label();
-        contentLabel.setWrapText(true);
-        contentLabel.getStyleClass().add("review-content");
+            contentLabel = new Label();
+            contentLabel.setWrapText(true);
+            contentLabel.getStyleClass().add("review-content");
 
-        answerBoxRow = new HBox(5);
-        answerLabelPrefix = new Label();
-        answerLabelPrefix.setText("Ristoratore: ");
-        answerLabelPrefix.setWrapText(true);
-        answerLabelPrefix.getStyleClass().add("review-answer");
-        answerLabelPrefix.setStyle("-fx-font-weight: bold;");
-        answerLabel = new Label();
-        answerLabel.setWrapText(true);
-        answerLabel.getStyleClass().add("review-answer");
+            answerBoxRow = new HBox(5);
+            answerLabelPrefix = new Label();
+            answerLabelPrefix.setText("Ristoratore: ");
+            answerLabelPrefix.setWrapText(true);
+            answerLabelPrefix.getStyleClass().add("review-answer");
+            answerLabelPrefix.setStyle("-fx-font-weight: bold;");
+            answerLabel = new Label();
+            answerLabel.setWrapText(true);
+            answerLabel.getStyleClass().add("review-answer");
 
-        // Initialize answer components
-        answerField = new TextField();
-        answerField.setPromptText("Write your answer...");
-        answerField.setPrefWidth(340);
+            // Initialize answer components
+            answerField = new TextField();
+            answerField.setPromptText("Rispondi al cliente...");
+            answerField.setPrefWidth(340);
 
-        Button answerButton = new Button("Submit");
-        answerButton.setOnAction(e -> handleAnswerSubmit());
+            Button answerButton = new Button("Submit");
+            answerButton.setOnAction(e -> handleAnswerSubmit());
 
-        answerBox = new VBox(5);
-        answerBox.getChildren().addAll(answerField, answerButton);
+            answerBox = new VBox(5);
+            answerBox.getChildren().addAll(answerField, answerButton);
 
-        contentBox.getChildren().addAll(headerBox, contentLabel);
-        
-                // Create action buttons
-        actionBox = new HBox(5);
-        Button editButton = new Button("Edit");
-        deleteButton = new Button("Delete");
-        
-        editButton.getStyleClass().add("small-button");
-        deleteButton.getStyleClass().add("small-button");
-        
-        actionBox.getChildren().addAll(editButton, deleteButton);
-        actionBox.setVisible(false); // Only show for user's own reviews
-        
-        contentBox.getChildren().add(actionBox);
+            contentBox.getChildren().addAll(headerBox, contentLabel);
 
-        // Add button handlers
-        editButton.setOnAction(e -> controller.handleEditReview(getItem()));
-        deleteButton.setOnAction(e -> controller.handleDeleteReview(SessionService.getRestaurantFromSession().orElse(null),getItem()));
-    }
+            // Create action buttons
+            actionBox = new HBox(5);
+            Button editButton = new Button("Edit");
+            Button deleteButton = new Button("Delete");
 
-    @Override
-    protected void updateItem(Review review, boolean empty) {
-        super.updateItem(review, empty);
+            editButton.getStyleClass().add("small-button");
+            deleteButton.getStyleClass().add("small-button");
 
-        if (empty || review == null) {
-            setGraphic(null);
-        } else {
-            // Set user and rating
-            userLabel.setText(review.getUser().getUsername());
-            starsLabel.setText("★".repeat(Math.max(1, Math.min(5, review.getStars()))));
+            actionBox.getChildren().addAll(editButton, deleteButton);
+            actionBox.setVisible(false); // Only show for user's own reviews
 
-            // Set review content
-            contentLabel.setText(review.getContent());
+            contentBox.getChildren().add(actionBox);
 
-            // Handle answer display/input
-            if (review.getAnswer() != null && !review.getAnswer().trim().isEmpty()) {
-                answerLabel.setText(review.getAnswer());
-                if (!contentBox.getChildren().contains(answerLabel)) {
-                    answerBoxRow.getChildren().addAll(answerLabelPrefix, answerLabel);
-                    contentBox.getChildren().add(answerBoxRow);
-                }
-                contentBox.getChildren().remove(answerBox);
+            // Add button handlers
+            editButton.setOnAction(e -> controller.handleEditReview(getItem()));
+            deleteButton.setOnAction(e -> controller.handleDeleteReview(SessionService.getRestaurantFromSession().orElse(null), getItem()));
+        }
+
+        @Override
+        protected void updateItem(Review review, boolean empty) {
+            super.updateItem(review, empty);
+
+            if (empty || review == null) {
+                setGraphic(null);
             } else {
-                // Show answer input for restaurant owners
-                contentBox.getChildren().remove(answerBoxRow);
-                if (SessionService.getUserFromSession() != null &&
-                        SessionService.getUserFromSession().getRole() == Role.RISTORATORE) {
-                    if (!contentBox.getChildren().contains(answerBox)) {
-                        contentBox.getChildren().add(answerBox);
+                // Set user and rating
+                userLabel.setText(review.getUser().getUsername());
+                starsLabel.setText("★".repeat(Math.max(1, Math.min(5, review.getStars()))));
+
+                // Set review content
+                contentLabel.setText(review.getContent());
+
+                // Handle answer display/input
+                if (review.getAnswer() != null && !review.getAnswer().trim().isEmpty()) {
+                    answerLabel.setText(review.getAnswer());
+                    if (!contentBox.getChildren().contains(answerLabel)) {
+                        answerBoxRow.getChildren().addAll(answerLabelPrefix, answerLabel);
+                        contentBox.getChildren().add(answerBoxRow);
                     }
-                } else {
                     contentBox.getChildren().remove(answerBox);
+                } else {
+                    // Show answer input for restaurant owners
+                    contentBox.getChildren().remove(answerBoxRow);
+                    if (SessionService.getUserFromSession() != null && SessionService.getUserFromSession().getRole() == Role.RISTORATORE) {
+                        if (!contentBox.getChildren().contains(answerBox)) {
+                            contentBox.getChildren().add(answerBox);
+                        }
+                    } else {
+                        contentBox.getChildren().remove(answerBox);
+                    }
                 }
+
+                // Show edit/delete buttons only for the review author
+                String currentUser = SessionService.getUserFromSession().getUsername();
+                boolean isAuthor = review.getUser().getUsername().equals(currentUser);
+                actionBox.setVisible(isAuthor);
+
+                setGraphic(contentBox);
             }
-            
-                        // Show edit/delete buttons only for the review author
-            String currentUser = SessionService.getUserFromSession().getUsername();
-            boolean isAuthor = review.getUser().getUsername().equals(currentUser);
-            actionBox.setVisible(isAuthor);
+        }
 
-            setGraphic(contentBox);
+        private void handleAnswerSubmit() {
+            Review review = getItem();
+            if (review != null && !answerField.getText().trim().isEmpty()) {
+                review.setAnswer(answerField.getText().trim());
+                updateItem(review, false);
+                ReviewsRepository.editReview(review);
+                // Clear the input field
+                answerField.clear();
+            }
         }
     }
 
-    private void handleAnswerSubmit() {
-        Review review = getItem();
-        if (review != null && !answerField.getText().trim().isEmpty()) {
-            review.setAnswer(answerField.getText().trim());
-            updateItem(review, false);
-            // Clear the input field
-            answerField.clear();
-        }
-    }
-}
-    
     public void handleEditReview(Review review) {
         // Hide add review box and show edit box
         addReviewBox.setVisible(false);
         editReviewBox.setVisible(true);
-        
+
         // Populate edit fields
         currentlyEditingReview = review;
         editReviewContent.setText(review.getContent());
@@ -471,10 +458,10 @@ private void setupReviewListView(List<Review> reviews) {
     @FXML
     public void handleSaveEditedReview(Restaurant restaurant) {
         if (currentlyEditingReview == null) return;
-        
+
         String content = editReviewContent.getText();
         Integer rating = editRatingSelector.getValue();
-        
+
         if (content == null || content.trim().isEmpty() || rating == null) {
             AlertService.alert(Alert.AlertType.WARNING, "ATTENZIONE", null, "Inserire tutti i campi richiesti per la modifica della recensione.");
             return;
@@ -490,7 +477,7 @@ private void setupReviewListView(List<Review> reviews) {
             editReviewBox.setVisible(false);
             addReviewBox.setVisible(true);
             currentlyEditingReview = null;
-            
+
             // Refresh the list
             setupReviewListView(restaurant.getReviews());
         } else {

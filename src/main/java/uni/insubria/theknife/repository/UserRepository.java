@@ -4,30 +4,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.fasterxml.jackson.databind.ObjectWriter;
 import uni.insubria.theknife.model.User;
 
 public class UserRepository {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
-    private static final String USERS_JSON;
-
-    static {
-        if (UserRepository.class.getClassLoader().getResource("data/users.json") != null) {
-            USERS_JSON = Objects.requireNonNull(UserRepository.class.getClassLoader().getResource("data/users.json")).getFile();
-        } else {
-            USERS_JSON = new File(Objects.requireNonNull(UserRepository.class.getClassLoader().getResource("data")).getFile(), "users.json").getAbsolutePath();
-        }
-    }
+    private static final String USERS_JSON = "data/users.json";
 
     public enum ERROR_CODE {
         DUPLICATED,

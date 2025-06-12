@@ -20,18 +20,10 @@ public class RestaurantRepository {
     //Aggiungere/Modificare/Eliminare ristoranti preferiti
     //TODO GITHUB TASK #11
     //transform .CSV to JSON and add/edit/delete review
-    private static final String RESTAURANTS_CSV = "/data/michelin_my_maps.csv";
-    private static final String RESTAURANTS_JSON;
+    private static final String RESTAURANTS_CSV = "data/michelin_my_maps.csv";
+    private static final String RESTAURANTS_JSON = "data/restaurants.json";
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    static {
-        if (ReviewsRepository.class.getClassLoader().getResource("data/restaurants.json") != null) {
-            RESTAURANTS_JSON = Objects.requireNonNull(ReviewsRepository.class.getClassLoader().getResource("data/restaurants.json")).getFile();
-        } else {
-            RESTAURANTS_JSON = new File(Objects.requireNonNull(ReviewsRepository.class.getClassLoader().getResource("data")).getFile(), "restaurants.json").getAbsolutePath();
-        }
-    }
 
     /**
      * Adds a new restaurant to the repository if it does not already exist.
@@ -74,7 +66,7 @@ public class RestaurantRepository {
      * @return A list of Restaurant objects parsed from the CSV file.
      */
     static public List<Restaurant> loadRestaurantsCSV() {
-        try (InputStream is = RestaurantRepository.class.getResourceAsStream(RESTAURANTS_CSV)) {
+        try (InputStream is = new FileInputStream(RESTAURANTS_CSV)) {
             Reader reader = new StringReader(new String(Objects.requireNonNull(is).readAllBytes()));
             CsvToBean<Restaurant> cb = new CsvToBeanBuilder<Restaurant>(reader)
                     .withType(Restaurant.class)

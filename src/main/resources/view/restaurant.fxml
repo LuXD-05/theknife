@@ -92,7 +92,7 @@
                 <ListView fx:id="reviewsListView" prefWidth="380"/>
             </ScrollPane>
             <VBox fx:id="addReviewBox" spacing="5">
-                <TextField fx:id="reviewContent" promptText="Write your review..."/>
+                <TextField fx:id="reviewContent" promptText="Valuta il ristorante..."/>
                 <ComboBox fx:id="ratingSelector" promptText="Select rating (1-5 stars)"/>
                 <Button fx:id="addReview" onAction="#handleAddReview" text="Add review"/>
                 <Label fx:id="registerMessage" visible="false"/>
