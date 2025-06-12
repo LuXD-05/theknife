@@ -38,8 +38,8 @@ public class SessionService {
     }
 
     public static void setSceneInSession(FXMLLoader fxmlLoader) throws IOException {
-        Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        Scene scene = new Scene(fxmlLoader.load(), screenSize.getWidth(), screenSize.getHeight());
+        // Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        Scene scene = new Scene(fxmlLoader.load(), 1024, 720);
         ((Stage) session.get(STAGE_KEY)).setScene(scene);
     }
 
