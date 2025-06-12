@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"uni.insubria.theknife"},{"l":"uni.insubria.theknife.controller"},{"l":"uni.insubria.theknife.model"},{"l":"uni.insubria.theknife.repository"},{"l":"uni.insubria.theknife.service"},{"l":"uni.insubria.theknife.util"}];updateSearchResults();
