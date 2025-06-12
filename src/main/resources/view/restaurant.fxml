@@ -75,30 +75,35 @@
             </ScrollPane>
         </VBox>
         <VBox alignment="TOP_CENTER" prefHeight="Infinity" prefWidth="400" spacing="10">
-            <Label text="Reviews" styleClass="section-header"/>
+            <VBox styleClass="review-summary-box" spacing="5" alignment="CENTER">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+                <HBox spacing="10" alignment="CENTER">
+                    <Label text="Total Reviews:" styleClass="label-bold"/>
+                    <Label fx:id="totalReviewsLabel"/>
+                </HBox>
+                <HBox spacing="10" alignment="CENTER">
+                    <Label text="Average Rating:" styleClass="label-bold"/>
+                    <Label fx:id="averageRatingLabel"/>
+                </HBox>
+            </VBox>
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
                 <ListView fx:id="reviewsListView" prefWidth="380"/>
             </ScrollPane>
-
-            <VBox spacing="10" alignment="CENTER">
-                <VBox fx:id="replyBox" visible="false" spacing="5">
-                    <TextField fx:id="replyContent" promptText="Write your reply..."/>
-                    <Button fx:id="addReply" text="Add Reply" onAction="#handleAddReply"/>
-                </VBox>
-                <VBox fx:id="addReviewBox" spacing="5">
-                    <TextField fx:id="reviewContent" promptText="Write your review..."/>
-                    <ComboBox fx:id="ratingSelector" promptText="Select rating (1-5 stars)"/>
-                    <Button fx:id="addReview" onAction="#handleAddReview" text="Add review"/>
-                    <Label fx:id="registerMessage" visible="false"/>
-                </VBox>
-                <VBox fx:id="editReviewBox" visible="false" spacing="5">
-                    <TextField fx:id="editReviewContent" promptText="Edit your review..."/>
-                    <ComboBox fx:id="editRatingSelector" promptText="Select rating (1-5 stars)"/>
-                    <HBox spacing="5.0">
-                        <Button text="Save" onAction="#handleSaveEditedReview"/>
-                        <Button text="Cancel" onAction="#handleCancelEdit"/>
-                    </HBox>
-                </VBox>
+            <VBox fx:id="addReviewBox" spacing="5">
+                <TextField fx:id="reviewContent" promptText="Write your review..."/>
+                <ComboBox fx:id="ratingSelector" promptText="Select rating (1-5 stars)"/>
+                <Button fx:id="addReview" onAction="#handleAddReview" text="Add review"/>
+                <Label fx:id="registerMessage" visible="false"/>
+            </VBox>
+            <VBox fx:id="editReviewBox" visible="false" spacing="5">
+                <TextField fx:id="editReviewContent" promptText="Edit your review..."/>
+                <ComboBox fx:id="editRatingSelector" promptText="Select rating (1-5 stars)"/>
+                <HBox spacing="5.0">
+                    <Button text="Save" onAction="#handleSaveEditedReview"/>
+                    <Button text="Cancel" onAction="#handleCancelEdit"/>
+                </HBox>
             </VBox>
         </VBox>
     </HBox>

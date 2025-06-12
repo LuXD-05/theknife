@@ -13,7 +13,7 @@
     <VBox spacing="10" alignment="CENTER">
         <TextField fx:id="usernameTextField" layoutX="172.0" layoutY="20.0" prefHeight="27.0" prefWidth="300.0"
                    promptText="Username"/>
-        <TextField fx:id="passwordTextField" layoutX="172.0" layoutY="56.0" prefHeight="27.0" prefWidth="300.0"
+        <PasswordField fx:id="passwordTextField" layoutX="172.0" layoutY="56.0" prefHeight="27.0" prefWidth="300.0"
                    promptText="Password"/>
         <Button layoutX="172.0" layoutY="102.0" onAction="#onLoginButtonClick" prefHeight="27.0" prefWidth="300.0"
                 text="Accedi"/>

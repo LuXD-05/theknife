@@ -70,11 +70,11 @@ public class RestaurantController {
     @FXML
     private Label welcomeLabel;
     @FXML
-    private VBox replyBox;
-    @FXML
-    private TextField replyContent;
-    @FXML
     private ListView<Review> reviewsListView;
+    @FXML
+    private Label totalReviewsLabel;
+    @FXML
+    private Label averageRatingLabel;
 
     private final ObservableList<Review> reviewObservableList = FXCollections.observableArrayList();
 
@@ -99,8 +99,6 @@ public class RestaurantController {
             if (newVal != null && SessionService.getUserFromSession() != null
                     && SessionService.getUserFromSession().getRole() == Role.RISTORATORE) {
                 selectedReview = newVal;
-                replyBox.setVisible(true);
-                replyContent.setText(newVal.getAnswer() != null ? newVal.getAnswer() : "");
             }
         });
     }
@@ -109,7 +107,6 @@ public class RestaurantController {
         User user = SessionService.getUserFromSession();
         welcomeLabel.setText(String.format("Welcome %s!", user != null ? user.getUsername() : "guest"));
 
-        replyBox.setVisible(false); // Initially hide reply box
         boolean isRistoratore = user != null && user.getRole() == Role.RISTORATORE;
         if (isRistoratore) {
             addReviewBox.setVisible(false);
@@ -261,23 +258,6 @@ public class RestaurantController {
     }
 
     @FXML
-    private void handleAddReply() {
-        if (selectedReview == null || replyContent.getText().isEmpty()) {
-            showAlert(MISSING_INFO_TITLE, "Please select a review and write a reply.");
-            return;
-        }
-
-        selectedReview.setAnswer(replyContent.getText());
-        reviewsListView.refresh();
-
-        replyContent.clear();
-        replyBox.setVisible(false);
-        selectedReview = null;
-        reviewsListView.getSelectionModel().clearSelection();
-    }
-
-
-    @FXML
     private void handleBack() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/home.fxml"));
@@ -300,6 +280,17 @@ public class RestaurantController {
         }
     }
 
+private void updateReviewSummary(List<Review> reviews) {
+    int totalReviews = reviews.size();
+    double averageRating = reviews.stream()
+            .mapToInt(Review::getStars)
+            .average()
+            .orElse(0.0);
+
+    totalReviewsLabel.setText(String.valueOf(totalReviews));
+    averageRatingLabel.setText(String.format("%.1f ★", averageRating));
+}
+
 private void setupReviewListView(List<Review> reviews) {
     if (reviews == null) {
         reviews = new ArrayList<>();
@@ -308,6 +299,9 @@ private void setupReviewListView(List<Review> reviews) {
     reviewsListView.setItems(reviewObservableList);
     reviewsListView.setCellFactory(listView -> new ReviewCell(this));
     reviewsListView.refresh();
+    
+    // Update the summary when reviews change
+    updateReviewSummary(reviews);
 }
 
     public void handleSaveEditedReview(ActionEvent actionEvent) {

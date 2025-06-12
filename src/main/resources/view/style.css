@@ -60,3 +60,10 @@
     -fx-font-style: italic;
     -fx-padding: 5 0 0 15;
 }
+
+.review-summary-box {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 5;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 5;
+}

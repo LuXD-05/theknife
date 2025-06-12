@@ -100,9 +100,11 @@ public class ReviewsRepository {
                 return ERROR_CODE.SERVICE_ERROR;
             }
 
-            // Add review to restaurant's review list if it doesn't exist already
             if (review.getRestaurant().getReviews() == null) {
                 review.getRestaurant().setReviews(new ArrayList<>());
+            } else {
+                List<Review> mutableReviews = new ArrayList<>(review.getRestaurant().getReviews());
+                review.getRestaurant().setReviews(mutableReviews);
             }
             review.getRestaurant().getReviews().add(review);
 

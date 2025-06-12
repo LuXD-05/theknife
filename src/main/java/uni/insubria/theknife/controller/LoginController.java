@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.controlsfx.control.textfield.TextFields;
 import uni.insubria.theknife.Main;
@@ -22,7 +23,9 @@ public class LoginController {
     }
 
     @FXML
-    private TextField cityTextField, usernameTextField, passwordTextField;
+    private TextField cityTextField, usernameTextField;
+    @FXML
+    private PasswordField passwordTextField;
 
     @FXML
     protected void onLoginButtonClick() throws IOException {
