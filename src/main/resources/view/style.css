@@ -1,10 +1,10 @@
 .v-box {
     -fx-background-color: linear-gradient(from 0% 0% to 100% 100%,
-    #18288d 0%,
-    #3663bf 25%,
-    #0f6bae 50%,
-    #248bd6 75%,
-    #43b8ff 100%);
+    #2d5941 0%,
+    #4fa66a 25%,
+    #6fcf97 50%,
+    #a3d9a5 75%,
+    #d0f0c0 100%);
 }
 
 .text-field {
@@ -22,7 +22,7 @@
 }
 
 .button {
-    -fx-background-color: rgba(255, 255, 255, 0.6);
+    -fx-background-color: rgba(208, 240, 192, 0.6);
     -fx-text-fill: #16161D;
     -fx-cursor: hand;
 }

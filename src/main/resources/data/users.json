@@ -11,9 +11,28 @@
     ],
     "city": "Varese, Italy",
     "role": "RISTORATORE",
-    "restaurants": [{
-      "id": "811930234"
-    }]
+    "restaurants": [
+      {
+        "id": "811930234",
+        "name": null,
+        "address": null,
+        "location": null,
+        "price": null,
+        "cuisine": null,
+        "longitude": null,
+        "latitude": null,
+        "phone": null,
+        "michelinUrl": null,
+        "websiteUrl": null,
+        "award": null,
+        "greenStar": null,
+        "facilities": null,
+        "description": null,
+        "distance": null,
+        "reviews": [],
+        "user": null
+      }
+    ]
   },
   "mmordente-cliente": {
     "username": "mmordente-cliente",
@@ -28,5 +47,37 @@
     "city": "Varese, Italy",
     "role": "CLIENTE",
     "restaurants": []
+  },
+  "lucchetto-cliente": {
+    "username": "lucchetto-cliente",
+    "firstName": "Luca",
+    "lastName": "Morosini",
+    "password": "$2a$10$xaLHLw9sxGF9TWCaXiZLeOytDWogSaw1ZBKMbx1klqD0GNUGV3haO",
+    "birthDate": [
+      2005,
+      9,
+      18
+    ],
+    "city": "Busto Arsizio, Italy",
+    "role": "CLIENTE",
+    "restaurants": []
+  },
+  "lucchetto-risto": {
+    "username": "lucchetto-risto",
+    "firstName": "Luca",
+    "lastName": "Morosini",
+    "password": "$2a$10$/eBhP022HuL7NL/G4iwvluAmyKBVMWSw63HUDHhMPJZe9Gi2NfBP.",
+    "birthDate": [
+      2005,
+      9,
+      18
+    ],
+    "city": "Busto Arsizio, Italy",
+    "role": "RISTORATORE",
+    "restaurants": [
+      {
+        "id": "811930234"
+      }
+    ]
   }
 }
