@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.geometry.Insets;
+import uni.insubria.theknife.repository.UserRepository;
 
 /**
  * Controller for the restaurant detail screen of the TheKnife application.
@@ -83,10 +84,6 @@ public class RestaurantController {
      * The review currently being edited.
      */
     private Review currentlyEditingReview;
-
-    //TODO
-    //GITHUB TASK #12 - #13 - #14
-    //Risposta recensioni + Report riepilogo recensioni + dettaglio recensioni
 
     /**
      * Message displayed when a user tries to add a review without being logged in.
@@ -183,6 +180,9 @@ public class RestaurantController {
      */
     @FXML
     private Label averageRatingLabel;
+
+    @FXML
+    private Button toggleFavorite;
 
     /**
      * Observable list of reviews for binding to the reviews list view.
@@ -937,4 +937,34 @@ public class RestaurantController {
         addReviewBox.setVisible(true);
         currentlyEditingReview = null;
     }
+
+    //#region Favorites
+
+    @FXML
+    public void handleAddRestaurantToFavorites() {
+
+        // Gets user & restaurant in session
+        User user = validateUser();
+        Restaurant restaurant = validateRestaurant();
+
+        // Checks if they are in session + if user is not ristoratore
+        if (user == null || restaurant == null || user.getRole() == Role.RISTORATORE) 
+            return;
+
+        // Toggle favorite in user object + alert on error
+        UserRepository.ERROR_CODE result =  UserRepository.toggleFavoriteRestaurant(user, restaurant);
+        if (result != UserRepository.ERROR_CODE.NONE) {
+            AlertService.alert(Alert.AlertType.ERROR, "ATTENZIONE", null, "Errore durante l'aggiunta/rimozione del preferito.");
+            return;
+        }
+
+        // If user now contains restaurant as favorite --> set text accordingly
+        if (user.getRestaurants().contains(restaurant))
+            toggleFavorite.setText("Preferito");
+        else
+            toggleFavorite.setText("Non preferito");
+
+    }
+
+    //#endregion
 }
