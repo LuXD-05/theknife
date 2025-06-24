@@ -35,10 +35,6 @@ public class RestaurantRepository {
     public RestaurantRepository() {
         // Default constructor - not meant to be used
     }
-    //TODO GITHUB TASK #9
-    //Aggiungere/Modificare/Eliminare ristoranti preferiti
-    //TODO GITHUB TASK #11
-    //transform .CSV to JSON and add/edit/delete review
 
     /**
      * Path to the CSV file containing the initial restaurant data.
@@ -54,6 +50,7 @@ public class RestaurantRepository {
      * Jackson ObjectMapper instance used for JSON serialization and deserialization.
      */
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
 
 
     /**
@@ -117,6 +114,10 @@ public class RestaurantRepository {
     }
 
 
+    
+    //#region Restaurant CRUD
+
+    //TODO TASK #11 --> non funziona + non bindata a niente
     /**
      * Adds a new restaurant to the repository if it does not already exist.
      *
@@ -132,7 +133,7 @@ public class RestaurantRepository {
         if (restaurants.containsKey(id)) {
             return ERROR_CODE.DUPLICATED;
         }
-        restaurants.put(id, restaurant.setId(id));
+        restaurants.put(id, restaurant.setId(id)); //! ERROR? --> map contains restaurant name, not id like reviews
         try {
             saveRestaurants(restaurants);
         } catch (IOException e) {
@@ -140,7 +141,6 @@ public class RestaurantRepository {
         }
         return ERROR_CODE.NONE;
     }
-
 
     /**
      * Edits the provided Restaurant object within the list of restaurants.
@@ -183,6 +183,8 @@ public class RestaurantRepository {
         }
         return ERROR_CODE.SERVICE_ERROR;
     }
+
+    //#endregion
 
     /**
      * Enumeration of possible error codes returned by repository operations.
