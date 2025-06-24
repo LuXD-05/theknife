@@ -269,6 +269,8 @@ public class HomeController {
     private void handleRestaurantSelection() {
         try {
             Restaurant selectedRestaurant = restaurantListView.getSelectionModel().getSelectedItem();
+            if (selectedRestaurant == null)
+                return;
             SessionService.setRestaurantInSession(selectedRestaurant);
             navigateToRestaurantView();
         } catch (IOException e) {
