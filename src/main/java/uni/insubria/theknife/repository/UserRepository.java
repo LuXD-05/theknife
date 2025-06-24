@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import uni.insubria.theknife.model.Restaurant;
 import uni.insubria.theknife.model.User;
 
 /**
@@ -125,4 +126,44 @@ public class UserRepository {
         }
         return ERROR_CODE.NONE;
     }
+
+    //TODO GITHUB TASK #9:    
+    //#region Favorites CRUD
+
+    /**
+     * Adds a restaurant to the current user's favorite list.
+     *
+     * @param restaurant the restaurant to add to favorites
+     * @return ERROR_CODE an error code indicating the result of the operation:
+     * - DUPLICATED if the restaurant already exists in the repository
+     * - SERVICE_ERROR if an error occurs during saving the repository
+     * - NONE if the restaurant is successfully added
+     */
+    public static ERROR_CODE toggleFavoriteRestaurant(User user, Restaurant restaurant) {
+
+        Map<String, User> users = loadUsers();
+        HashSet<Restaurant> favorites = users.get(user.getUsername()).getRestaurants();
+
+        if (favorites.contains(restaurant))
+            favorites.remove(restaurant);
+        else
+            favorites.add(restaurant);
+
+        // Replaces old user with the new one with updated favorites
+        users.put(user.getUsername(), user);
+
+        try {
+            UserRepository.saveUsers(users);
+        } catch (IOException e) {
+            return ERROR_CODE.SERVICE_ERROR;
+        }
+
+        return ERROR_CODE.NONE;
+
+    }
+
+
+    
+    //#endregion
+
 }
