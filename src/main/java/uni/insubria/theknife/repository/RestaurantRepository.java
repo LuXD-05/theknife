@@ -55,29 +55,6 @@ public class RestaurantRepository {
      */
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * Adds a new restaurant to the repository if it does not already exist.
-     *
-     * @param restaurant the restaurant to add
-     * @return ERROR_CODE an error code indicating the result of the operation:
-     * - DUPLICATED if the restaurant already exists in the repository
-     * - SERVICE_ERROR if an error occurs during saving the repository
-     * - NONE if the restaurant is successfully added
-     */
-    public static ERROR_CODE addRestaurant(Restaurant restaurant) {
-        Map<String, Restaurant> restaurants = loadRestaurants();
-        String id = String.valueOf(Objects.hash(restaurant.getName(), restaurant.getLatitude(), restaurant.getLongitude()));
-        if (restaurants.containsKey(id)) {
-            return ERROR_CODE.DUPLICATED;
-        }
-        restaurants.put(id, restaurant.setId(id));
-        try {
-            saveRestaurants(restaurants);
-        } catch (IOException e) {
-            return ERROR_CODE.SERVICE_ERROR;
-        }
-        return ERROR_CODE.NONE;
-    }
 
     /**
      * Saves the provided map of restaurants to a JSON file.
@@ -137,6 +114,31 @@ public class RestaurantRepository {
         } catch (IOException e) {
             throw new RuntimeException("Errore durante il caricamento delle recensioni", e);
         }
+    }
+
+
+    /**
+     * Adds a new restaurant to the repository if it does not already exist.
+     *
+     * @param restaurant the restaurant to add
+     * @return ERROR_CODE an error code indicating the result of the operation:
+     * - DUPLICATED if the restaurant already exists in the repository
+     * - SERVICE_ERROR if an error occurs during saving the repository
+     * - NONE if the restaurant is successfully added
+     */
+    public static ERROR_CODE addRestaurant(Restaurant restaurant) {
+        Map<String, Restaurant> restaurants = loadRestaurants();
+        String id = String.valueOf(Objects.hash(restaurant.getName(), restaurant.getLatitude(), restaurant.getLongitude()));
+        if (restaurants.containsKey(id)) {
+            return ERROR_CODE.DUPLICATED;
+        }
+        restaurants.put(id, restaurant.setId(id));
+        try {
+            saveRestaurants(restaurants);
+        } catch (IOException e) {
+            return ERROR_CODE.SERVICE_ERROR;
+        }
+        return ERROR_CODE.NONE;
     }
 
 
