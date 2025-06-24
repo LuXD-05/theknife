@@ -38,10 +38,7 @@ public class ReviewsRepository {
         // Default constructor - not meant to be used
     }
 
-    //TODO GITHUB TASK #7
-    //finalise repository and pre-load some review for restaurants (demo purposes)
-    //TODO GITHUB TASK #10
-    //add/edit/delete review
+
 
     /**
      * Jackson ObjectMapper instance configured to exclude null and empty values during serialization.
@@ -77,6 +74,8 @@ public class ReviewsRepository {
          */
         NONE
     }
+
+
 
     /**
      * Retrieves all reviews for a specific restaurant.
@@ -149,6 +148,8 @@ public class ReviewsRepository {
             return new HashMap<>();
         }
     }
+
+    //#region Review CRUD
 
     /**
      * Adds a new review to the repository.
@@ -240,4 +241,7 @@ public class ReviewsRepository {
             return ERROR_CODE.SERVICE_ERROR;
         }
     }
+
+    //#endregion
+
 }
