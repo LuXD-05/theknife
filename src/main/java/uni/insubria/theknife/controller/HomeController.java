@@ -6,17 +6,20 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.textfield.TextFields;
 import uni.insubria.theknife.model.Restaurant;
 import uni.insubria.theknife.model.Role;
 import uni.insubria.theknife.model.User;
+import uni.insubria.theknife.repository.RestaurantRepository;
 import uni.insubria.theknife.service.SessionService;
 import uni.insubria.theknife.util.DistanceCalculator;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -208,6 +211,24 @@ public class HomeController {
         restaurantListView.setItems(restaurantList);
         restaurantListView.setCellFactory(this::createRestaurantCell);
     }
+
+    //TODO GITHUB TASK #11
+    // TextField used to capture the user's input for restaurant name search
+    @FXML
+    private TextField searchField;
+
+    @FXML
+    private void handleSearch(KeyEvent event) {
+        // Get the current text from the search field
+        String query = searchField.getText();
+
+        // Call the search function to retrieve matching restaurants based on the query
+        List<Restaurant> results = RestaurantRepository.searchRestaurants(query);
+
+        // Update the ListView with the search results
+        restaurantListView.setItems(FXCollections.observableArrayList(results));
+    }
+
 
     /**
      * Creates a custom cell factory for the restaurant list view.

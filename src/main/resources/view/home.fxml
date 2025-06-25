@@ -21,11 +21,22 @@
     </HBox>
     <VBox alignment="CENTER" prefHeight="Infinity" prefWidth="600" fillWidth="false" spacing="10.0">
         <Pane prefHeight="523.0" prefWidth="525.0">
-            <TextField fx:id="selectedLocation" layoutX="172.0" prefHeight="27.0" prefWidth="300.0"
-                       promptText="Seleziona una città"
-                       onKeyReleased="#handleCitySelection"/>
-            <ListView fx:id="restaurantListView" layoutX="10.0" layoutY="60.0" prefWidth="500.0" prefHeight="450.0"
-                      onMouseClicked="#handleRestaurantSelection"/>
+            <!-- Grouping city and restaurant search in a horizontal layout -->
+            <HBox layoutX="10.0" layoutY="20.0" spacing="20.0" alignment="CENTER_LEFT">
+                <!-- TextField to select city -->
+                <TextField fx:id="selectedLocation" prefHeight="27.0" prefWidth="230.0"
+                        promptText="Seleziona una città"
+                        onKeyReleased="#handleCitySelection"/>
+
+                <!-- Search bar for restaurant name -->
+                <TextField fx:id="searchField" prefHeight="27.0" prefWidth="230.0"
+                        promptText="Cerca un ristorante"
+                        onKeyReleased="#handleSearch"/>
+            </HBox>
+
+            <!-- Restaurant list view -->
+            <ListView fx:id="restaurantListView" layoutX="10.0" layoutY="70.0" prefWidth="500.0" prefHeight="440.0"
+                    onMouseClicked="#handleRestaurantSelection"/>
         </Pane>
     </VBox>
 </VBox>
