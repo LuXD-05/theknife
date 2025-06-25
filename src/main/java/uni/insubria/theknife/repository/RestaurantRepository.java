@@ -35,6 +35,10 @@ public class RestaurantRepository {
     public RestaurantRepository() {
         // Default constructor - not meant to be used
     }
+    //TODO GITHUB TASK #9
+    //Aggiungere/Modificare/Eliminare ristoranti preferiti
+    //TODO GITHUB TASK #11
+    //Search Restaurants
 
     /**
      * Path to the CSV file containing the initial restaurant data.
@@ -183,8 +187,6 @@ public class RestaurantRepository {
         }
         return ERROR_CODE.SERVICE_ERROR;
     }
-
-    //#endregion
 
     /**
      * Enumeration of possible error codes returned by repository operations.
