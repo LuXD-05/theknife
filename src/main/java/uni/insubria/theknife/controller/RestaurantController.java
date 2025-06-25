@@ -6,11 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
-import javafx.scene.control.ListCell;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import uni.insubria.theknife.model.Restaurant;
 import uni.insubria.theknife.model.Review;
@@ -184,6 +180,12 @@ public class RestaurantController {
     @FXML
     private Button toggleFavorite;
 
+    @FXML
+    private Button editRestaurant;
+
+    @FXML
+    private Button deleteRestaurant;
+    
     /**
      * Observable list of reviews for binding to the reviews list view.
      */
@@ -262,13 +264,36 @@ public class RestaurantController {
      * </ul>
      */
     private void initializeUserState() {
+
         User user = SessionService.getUserFromSession();
         welcomeLabel.setText(String.format("Welcome %s!", user != null ? user.getUsername() : "guest"));
 
-        boolean isRistoratore = user != null && user.getRole() == Role.RISTORATORE;
-        if (isRistoratore) {
-            addReviewBox.setVisible(false);
+        if (user != null) {
+            switch (user.getRole()) {
+                case CLIENTE:
+                    toggleFavorite.setVisible(true);
+                    editRestaurant.setVisible(false);
+                    deleteRestaurant.setVisible(false);
+                    Restaurant r = SessionService.getRestaurantFromSession().orElse(null);
+                    if (user.getRestaurants().contains(r))
+                        toggleFavorite.setText("★");
+                    else
+                        toggleFavorite.setText("☆");
+                    break;
+                case RISTORATORE:
+                    toggleFavorite.setVisible(false);
+                    editRestaurant.setVisible(true);
+                    deleteRestaurant.setVisible(true);
+                    addReviewBox.setVisible(false);
+                    break;
+                default: 
+                    toggleFavorite.setVisible(false);
+                    editRestaurant.setVisible(false);
+                    deleteRestaurant.setVisible(false);
+                    break;
+            }
         }
+
         if (addReview != null) {
             if (user == null) {
                 addReview.setDisable(true);
@@ -941,7 +966,7 @@ public class RestaurantController {
     //#region Favorites
 
     @FXML
-    public void handleAddRestaurantToFavorites() {
+    public void handleToggleFavoriteRestaurant() {
 
         // Gets user & restaurant in session
         User user = validateUser();
@@ -960,10 +985,28 @@ public class RestaurantController {
 
         // If user now contains restaurant as favorite --> set text accordingly
         if (user.getRestaurants().contains(restaurant))
-            toggleFavorite.setText("Preferito");
+            toggleFavorite.setText("★");
         else
-            toggleFavorite.setText("Non preferito");
+            toggleFavorite.setText("☆");
 
+    }
+
+    //#endregion
+
+    //#region Restaurant CRUD
+
+    @FXML
+    public void handleEditRestaurant() {
+
+
+
+    }
+
+    @FXML
+    public void handleDeleteRestaurant() {
+
+
+        
     }
 
     //#endregion

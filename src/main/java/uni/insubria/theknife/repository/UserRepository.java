@@ -141,8 +141,7 @@ public class UserRepository {
      */
     public static ERROR_CODE toggleFavoriteRestaurant(User user, Restaurant restaurant) {
 
-        Map<String, User> users = loadUsers();
-        HashSet<Restaurant> favorites = users.get(user.getUsername()).getRestaurants();
+        HashSet<Restaurant> favorites = user.getRestaurants();
 
         if (favorites.contains(restaurant))
             favorites.remove(restaurant);
@@ -150,6 +149,7 @@ public class UserRepository {
             favorites.add(restaurant);
 
         // Replaces old user with the new one with updated favorites
+        Map<String, User> users = loadUsers();
         users.put(user.getUsername(), user);
 
         try {
