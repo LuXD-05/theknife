@@ -188,6 +188,38 @@ public class RestaurantRepository {
         return ERROR_CODE.SERVICE_ERROR;
     }
 
+    //TODO GITHUB TASK #11
+    /**
+     * Searches restaurants whose names contain the given search query (case-insensitive).
+     * 
+     * @param searchQuery The string typed by the user in the search box
+     * @return A list of matching Restaurant objects
+     */
+    public static List<Restaurant> searchRestaurants(String searchQuery) {
+
+        // Load all restaurants
+        Map<String, Restaurant> restaurants = loadRestaurants();
+
+        // If the input map is null or empty, return an empty list
+        if (restaurants == null || restaurants.isEmpty()) {
+            return List.of();
+        }
+
+        // If the search query is null or empty, return an empty list
+        if (searchQuery == null || searchQuery.trim().isEmpty()) {
+            return List.of();
+        }
+
+        // Normalize the input string to lowercase for case-insensitive comparison
+        String queryLower = searchQuery.toLowerCase();
+
+        // Use Stream API to filter matching restaurant names and return their corresponding objects
+        return restaurants.entrySet().stream()
+            .filter(entry -> entry.getKey().toLowerCase().contains(queryLower)) // case-insensitive match
+            .map(Map.Entry::getValue) // get the Restaurant objects
+            .collect(Collectors.toList());
+    }
+
     /**
      * Enumeration of possible error codes returned by repository operations.
      */
