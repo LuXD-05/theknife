@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -80,6 +81,11 @@ public class HomeController {
     private ListView<Restaurant> restaurantListView;
 
     /**
+     * Map for save all restaurants
+     */
+    private Map<String, Restaurant> allRestaurants = new HashMap<>();
+
+    /**
      * Label displaying welcome message with the current user's name.
      */
     @FXML
@@ -95,6 +101,18 @@ public class HomeController {
         initializeUserState();
         initializeLocationField();
         displayRestaurants();
+    }
+
+  
+    /**
+     * Initialize ListView
+     */
+    @FXML
+    public void initializeListView() {
+        // Load all restaurants only once, when the view is initialized
+        allRestaurants = RestaurantRepository.loadRestaurants();
+
+        restaurantListView.setItems(FXCollections.observableArrayList(allRestaurants.values()));
     }
 
     /**
@@ -212,22 +230,45 @@ public class HomeController {
         restaurantListView.setCellFactory(this::createRestaurantCell);
     }
 
-    //TODO GITHUB TASK #11
+    
     // TextField used to capture the user's input for restaurant name search
     @FXML
     private TextField searchField;
 
+    /**
+     * Handles the real-time search of restaurants based on user input in the search field.
+     * 
+     * This method is triggered every time a key is released inside the search TextField.
+     * It filters the currently visible list of restaurants by matching the input text
+     * with the restaurant names (case-insensitive). If the input is empty, it resets
+     * the view by displaying the original filtered list (by city and user role).
+     *
+     * @param event The KeyEvent triggered by typing in the search TextField
+     */
     @FXML
     private void handleSearch(KeyEvent event) {
-        // Get the current text from the search field
+        // Get the current input from the search field
         String query = searchField.getText();
 
-        // Call the search function to retrieve matching restaurants based on the query
-        List<Restaurant> results = RestaurantRepository.searchRestaurants(query);
+        // If the query is blank or null, restore the original list (filtered by city and user role)
+        if (query == null || query.isBlank()) {
+            displayRestaurants();
+            return;
+        }
 
-        // Update the ListView with the search results
+        // Get the currently displayed list of restaurants
+        List<Restaurant> currentRestaurants = restaurantListView.getItems();
+
+        // Filter the current list based on the search query
+        List<Restaurant> results = RestaurantRepository.searchRestaurants(currentRestaurants, query);
+
+        // Update the ListView with the filtered results
         restaurantListView.setItems(FXCollections.observableArrayList(results));
     }
+
+
+
+
 
 
     /**

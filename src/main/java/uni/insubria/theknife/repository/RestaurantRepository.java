@@ -188,37 +188,34 @@ public class RestaurantRepository {
         return ERROR_CODE.SERVICE_ERROR;
     }
 
-    //TODO GITHUB TASK #11
     /**
-     * Searches restaurants whose names contain the given search query (case-insensitive).
-     * 
-     * @param searchQuery The string typed by the user in the search box
-     * @return A list of matching Restaurant objects
+     * Filters a list of restaurants based on a search query that matches
+     * part of the restaurant's name (case-insensitive).
+     *
+     * @param restaurants  The list of Restaurant objects to search through
+     * @param searchQuery  The text input entered by the user
+     * @return A list of Restaurant objects whose names match the search query
      */
-    public static List<Restaurant> searchRestaurants(String searchQuery) {
-
-        // Load all restaurants
-        Map<String, Restaurant> restaurants = loadRestaurants();
-
-        // If the input map is null or empty, return an empty list
+    public static List<Restaurant> searchRestaurants(List<Restaurant> restaurants, String searchQuery) {
+        // Return an empty list if the input list is null or empty
         if (restaurants == null || restaurants.isEmpty()) {
             return List.of();
         }
 
-        // If the search query is null or empty, return an empty list
+        // If the search query is null or blank, return the original list (no filtering)
         if (searchQuery == null || searchQuery.trim().isEmpty()) {
-            return List.of();
+            return restaurants;
         }
 
-        // Normalize the input string to lowercase for case-insensitive comparison
+        // Normalize the search query to lowercase for case-insensitive comparison
         String queryLower = searchQuery.toLowerCase();
 
-        // Use Stream API to filter matching restaurant names and return their corresponding objects
-        return restaurants.entrySet().stream()
-            .filter(entry -> entry.getKey().toLowerCase().contains(queryLower)) // case-insensitive match
-            .map(Map.Entry::getValue) // get the Restaurant objects
-            .collect(Collectors.toList());
+        // Filter the list by checking if each restaurant name contains the query
+        return restaurants.stream()
+                .filter(r -> r.getName().toLowerCase().contains(queryLower))
+                .collect(Collectors.toList());
     }
+
 
     /**
      * Enumeration of possible error codes returned by repository operations.
