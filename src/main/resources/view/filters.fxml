@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
+<VBox xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="uni.insubria.theknife.controller.FiltersController"
+      prefHeight="Infinity" spacing="10.0"
+      stylesheets="@style.css" styleClass="v-box">
+    
+    <HBox alignment="CENTER" spacing="50.0">
+        <Button fx:id="backButton" onMouseClicked="#handleBack" text="Back"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="welcomeLabel"/>
+        <Button onAction="#handleLogout" text="Logout"/>
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+    </HBox>
+
+    <VBox alignment="CENTER_LEFT" spacing="30.0">
+        <padding>
+            <Insets right="20" left="20"/>
+        </padding>
+
+        <Label text="Filtri" alignment="CENTER" maxWidth="Infinity" style="-fx-font-size: 18px; -fx-alignment: center;"/>
+
+        <!-- Cuisine -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Tipologia di cucina" />
+            <TextField fx:id="cuisineField" promptText="Tutte le tipologie" />
+        </HBox>
+
+        <!-- Location -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Location" />
+            <TextField fx:id="locationField" promptText="Tutte le location" />
+        </HBox>
+
+        <!-- Price -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Fascia di prezzo" />
+            <ComboBox fx:id="priceCombo">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Qualsiasi" />
+                        <String fx:value="$" />
+                        <String fx:value="$$" />
+                        <String fx:value="$$$" />
+                        <String fx:value="$$$$" />
+                    </FXCollections>
+                </items>
+            </ComboBox>
+        </HBox>
+
+        <!-- delivery + online booking -->
+        <CheckBox fx:id="deliveryCheck" text="Delivery disponibile" />
+        <CheckBox fx:id="onlineBookingCheck" text="Prenotazione online" />
+
+        <!-- Average rating -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Rating minimo" />
+            <ComboBox fx:id="starsCombo">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Qualsiasi" />
+                        <String fx:value="1★" />
+                        <String fx:value="2★" />
+                        <String fx:value="3★" />
+                        <String fx:value="4★" />
+                        <String fx:value="5★" />
+                    </FXCollections>
+                </items>
+            </ComboBox>
+        </HBox>
+
+        <!-- btns -->
+        <HBox alignment="CENTER" maxWidth="Infinity" prefWidth="Infinity" spacing="10">
+            <Button fx:id="resetFiltersBtn" text="Pulisci" onAction="#handleResetFilters" />
+            <Button fx:id="applyFiltersBtn" text="Applica" onAction="#handleApplyFilters" />
+        </HBox>
+
+    </VBox>
+
+</VBox>
