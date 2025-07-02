@@ -6,7 +6,9 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+
 import org.controlsfx.control.textfield.TextFields;
+
 import uni.insubria.theknife.Main;
 import uni.insubria.theknife.service.AlertService;
 import uni.insubria.theknife.service.SecurityService;
@@ -15,6 +17,8 @@ import uni.insubria.theknife.model.User;
 import uni.insubria.theknife.repository.UserRepository;
 
 import java.io.IOException;
+
+import uni.insubria.theknife.model.FilterOptions;
 
 /**
  * Controller for the login screen of the TheKnife application.
@@ -136,8 +140,13 @@ public class LoginController {
 
         boolean locationExists = SessionService.getLocations().stream().anyMatch(location -> location.equalsIgnoreCase(selectedLocation));
 
-        if (locationExists) {
-            SessionService.setLocation(selectedLocation);
+        if (selectedLocation == null || selectedLocation.isBlank()) {
+            SessionService.setFilters(new FilterOptions());
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/home.fxml"));
+            SessionService.setSceneInSession(fxmlLoader);
+        } else if (locationExists) {
+            // SessionService.setLocation(selectedLocation);
+            SessionService.setFilters(new FilterOptions().setLocation(selectedLocation));
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/home.fxml"));
             SessionService.setSceneInSession(fxmlLoader);
         } else {
