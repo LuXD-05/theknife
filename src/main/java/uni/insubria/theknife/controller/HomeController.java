@@ -9,19 +9,26 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.slf4j.Slf4j;
+
 import org.controlsfx.control.textfield.TextFields;
+
+import uni.insubria.theknife.model.FilterOptions;
 import uni.insubria.theknife.model.Restaurant;
+import uni.insubria.theknife.model.Review;
 import uni.insubria.theknife.model.Role;
 import uni.insubria.theknife.model.User;
 import uni.insubria.theknife.repository.RestaurantRepository;
+import uni.insubria.theknife.repository.ReviewsRepository;
 import uni.insubria.theknife.service.SessionService;
 import uni.insubria.theknife.util.DistanceCalculator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -54,11 +61,6 @@ public class HomeController {
         // Default constructor required by FXML loader
     }
     /**
-     * Maximum distance in kilometers for filtering restaurants.
-     */
-    private static final int MAX_DISTANCE_KM = 50;
-
-    /**
      * Path to the restaurant detail view FXML file.
      */
     private static final String RESTAURANT_VIEW_PATH = "/view/restaurant.fxml";
@@ -69,10 +71,9 @@ public class HomeController {
     private static final String LOGIN_VIEW_PATH = "/view/login.fxml";
 
     /**
-     * Text field for selecting the current location.
+     * Path to the filters view FXML file.
      */
-    @FXML
-    private TextField selectedLocation;
+    private static final String FILTERS_VIEW_PATH = "/view/filters.fxml";
 
     /**
      * List view displaying available restaurants.
@@ -85,25 +86,42 @@ public class HomeController {
      */
     private Map<String, Restaurant> allRestaurants = new HashMap<>();
 
+    private boolean toggled = false;
+
     /**
      * Label displaying welcome message with the current user's name.
      */
     @FXML
     private Label welcomeLabel;
 
+    @FXML
+    private Button openFiltersBtn;
+
+    @FXML
+    private Button clearFiltersBtn;
+
+    @FXML
+    private ToggleButton favoritesToggle;
+
+    @FXML
+    private ToggleButton reviewedToggle;
+
+    @FXML
+    private Label listPlaceholder;
+
     /**
      * Initializes the controller.
      * This method is automatically called after the FXML file has been loaded.
-     * It sets up the user state, location field, and displays the list of restaurants.
+     * It sets up the user state, toggle buttons and displays the list of restaurants.
      */
     @FXML
     private void initialize() {
+        
         initializeUserState();
-        initializeLocationField();
         displayRestaurants();
+
     }
 
-  
     /**
      * Initialize ListView
      */
@@ -120,19 +138,33 @@ public class HomeController {
      * If a user is logged in, displays their username; otherwise, shows "guest".
      */
     private void initializeUserState() {
+
         User user = SessionService.getUserFromSession();
         welcomeLabel.setText(String.format("Welcome %s!", user != null ? user.getUsername() : "guest"));
-    }
 
-    /**
-     * Initializes the location field with the current location from the session.
-     * Sets up auto-completion for the location field using available locations.
-     */
-    private void initializeLocationField() {
-        if (SessionService.getLocation() != null) {
-            selectedLocation.setText(SessionService.getLocation());
+        Role role = user != null ? user.getRole() : null;
+
+        // Client --> favorites + reviewed
+        // Ristoratore --> no reviewed + toggle inserted
+        // guest --> none
+        if (role == Role.CLIENTE) {
+            favoritesToggle.setVisible(true);
+            favoritesToggle.setManaged(true);
+            favoritesToggle.setText("Mostra preferiti");
+            reviewedToggle.setVisible(true);
+            reviewedToggle.setManaged(true);
+        } else if (role == Role.RISTORATORE) {
+            favoritesToggle.setVisible(false);
+            favoritesToggle.setManaged(false);
+            reviewedToggle.setVisible(false);
+            reviewedToggle.setManaged(false);
+        } else {
+            favoritesToggle.setVisible(false);
+            favoritesToggle.setManaged(false);
+            reviewedToggle.setVisible(false);
+            reviewedToggle.setManaged(false);
         }
-        TextFields.bindAutoCompletion(selectedLocation, SessionService.getLocations());
+        
     }
 
     /**
@@ -146,8 +178,8 @@ public class HomeController {
      * </ol>
      */
     public void displayRestaurants() {
-        Restaurant.Coordinate referenceCoordinates = findReferenceCoordinates();
-        List<Restaurant> filteredRestaurants = getFilteredRestaurants(referenceCoordinates);
+        //Restaurant.Coordinate referenceCoordinates = findReferenceCoordinates();
+        List<Restaurant> filteredRestaurants = getFilteredRestaurants(/*referenceCoordinates*/);
         setupRestaurantListView(filteredRestaurants);
         setupSelectionHandler();
     }
@@ -162,13 +194,13 @@ public class HomeController {
      * @return A Coordinate object representing the reference point, or null if no restaurant
      *         is found in the current location
      */
-    private Restaurant.Coordinate findReferenceCoordinates() {
-        return SessionService.getRestaurants().stream()
-                .filter(restaurant -> restaurant.getLocation().equals(SessionService.getLocation()))
-                .map(restaurant -> new Restaurant.Coordinate(restaurant.getLongitude(), restaurant.getLatitude()))
-                .findFirst()
-                .orElse(null);
-    }
+    // private Restaurant.Coordinate findReferenceCoordinates() {
+    //     return SessionService.getRestaurants().stream()
+    //         .filter(restaurant -> restaurant.getLocation().equals(SessionService.getFilters().getLocation()))
+    //         .map(restaurant -> new Restaurant.Coordinate(restaurant.getLongitude(), restaurant.getLatitude()))
+    //         .findFirst()
+    //         .orElse(null);
+    // }
 
     /**
      * Filters and sorts the list of restaurants based on user role and distance.
@@ -185,12 +217,23 @@ public class HomeController {
      * @param referenceCoordinates The coordinates to calculate distances from
      * @return A filtered and sorted list of Restaurant objects
      */
-    private List<Restaurant> getFilteredRestaurants(Restaurant.Coordinate referenceCoordinates) {
+    private List<Restaurant> getFilteredRestaurants(/*Restaurant.Coordinate referenceCoordinates*/) {
+        //! NEW CODE --> always filter
+        FilterOptions filters = SessionService.getFilters();
+        User user = SessionService.getUserFromSession();
         return SessionService.getRestaurants().stream()
-                .filter(restaurant -> SessionService.getUserFromSession() == null || !Role.RISTORATORE.equals(SessionService.getUserFromSession().getRole()) || SessionService.getUserFromSession().getRestaurants().contains(restaurant))
-                .peek(restaurant -> updateRestaurantDistance(restaurant, referenceCoordinates))
-                .sorted(Comparator.comparingDouble(Restaurant::getDistance))
-                .collect(Collectors.toList());
+            .filter(restaurant -> user == null || !Role.RISTORATORE.equals(user.getRole()) || user.getRestaurants().contains(restaurant))
+            .filter(restaurant -> filters == null || filters.matches(restaurant))
+            //.peek(restaurant -> updateRestaurantDistance(restaurant, referenceCoordinates))
+            .sorted(Comparator.comparing(Restaurant::getName, String.CASE_INSENSITIVE_ORDER)) // Comparator.comparingDouble(Restaurant::getDistance)
+            .collect(Collectors.toList());
+            
+        //! OLD CODE --> doesn't always filter
+        // return SessionService.getRestaurants().stream()
+        //         .filter(restaurant -> SessionService.getUserFromSession() == null || !Role.RISTORATORE.equals(SessionService.getUserFromSession().getRole()) || SessionService.getUserFromSession().getRestaurants().contains(restaurant))
+        //         .peek(restaurant -> updateRestaurantDistance(restaurant, referenceCoordinates))
+        //         .sorted(Comparator.comparingDouble(Restaurant::getDistance))
+        //         .collect(Collectors.toList());
     }
 
     /**
@@ -204,12 +247,12 @@ public class HomeController {
      * @param referenceCoordinates The reference coordinates to calculate distance from,
      *                            or null if no reference coordinates are available
      */
-    private void updateRestaurantDistance(Restaurant restaurant, Restaurant.Coordinate referenceCoordinates) {
-        if (referenceCoordinates != null) {
-            double distance = DistanceCalculator.calculateDistanceInKm(restaurant, referenceCoordinates);
-            restaurant.setDistance(distance);
-        }
-    }
+    // private void updateRestaurantDistance(Restaurant restaurant, Restaurant.Coordinate referenceCoordinates) {
+    //     if (referenceCoordinates != null) {
+    //         double distance = DistanceCalculator.calculateDistanceInKm(restaurant, referenceCoordinates);
+    //         restaurant.setDistance(distance);
+    //     }
+    // }
 
     /**
      * Sets up the restaurant list view with the provided list of restaurants.
@@ -266,11 +309,6 @@ public class HomeController {
         restaurantListView.setItems(FXCollections.observableArrayList(results));
     }
 
-
-
-
-
-
     /**
      * Creates a custom cell factory for the restaurant list view.
      * <p>
@@ -302,10 +340,7 @@ public class HomeController {
      * @return A formatted string representation of the restaurant
      */
     private String formatRestaurantText(Restaurant restaurant) {
-        return String.format("%s - %s - (%.0fkm)",
-                restaurant.getName(),
-                restaurant.getLocation(),
-                restaurant.getDistance());
+        return String.format("%s - %s"/* - (%.0fkm)*/, restaurant.getName(), restaurant.getLocation()/*, restaurant.getDistance()*/);
     }
 
     /**
@@ -354,14 +389,78 @@ public class HomeController {
         SessionService.setSceneInSession(fxmlLoader);
     }
 
-    /**
-     * Handles the selection of a city from the location field.
-     * Updates the current location in the session and refreshes the restaurant list.
-     */
-    public void handleCitySelection() {
-        String selectedCity = selectedLocation.getText();
-        SessionService.setLocation(selectedCity);
+    @FXML
+    public void handleOpenFilters() throws IOException{
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(FILTERS_VIEW_PATH));
+        SessionService.setSceneInSession(fxmlLoader);
+    }
+
+    @FXML
+    private void handleClearFilters() {
+        // Resets filters & re-display restaurants
+        SessionService.setFilters(new FilterOptions());
         displayRestaurants();
+    }
+
+    @FXML
+    private void handleFavoritesToggle() {
+
+        reviewedToggle.setSelected(false);
+        toggled = favoritesToggle.isSelected();
+
+        searchField.setDisable(toggled);
+        openFiltersBtn.setDisable(toggled);
+        clearFiltersBtn.setDisable(toggled);
+        
+        // Shows favorites if toggled, otherwise restaurants normally
+        if (toggled) {
+            User user = SessionService.getUserFromSession();
+            listPlaceholder.setText("Nessun ristorante preferito.");
+            setupRestaurantListView(new ArrayList<>(user.getRestaurants()));
+        } else {
+            listPlaceholder.setText("Nessun ristorante trovato per la location selezionata.");
+            displayRestaurants();
+        }
+
+    }
+
+    @FXML
+    private void handleReviewedToggle() {
+
+        favoritesToggle.setSelected(false);
+        toggled = reviewedToggle.isSelected();
+
+        searchField.setDisable(toggled);
+        openFiltersBtn.setDisable(toggled);
+        clearFiltersBtn.setDisable(toggled);
+        
+        // Shows reviewed if toggled, otherwise restaurants normally
+        if (toggled) {
+            listPlaceholder.setText("Nessun ristorante recensito.");
+
+            // Get user in session & all restaurants
+            User user = SessionService.getUserFromSession();
+            List<Restaurant> restaurants = SessionService.getRestaurants();
+
+            // Get only restaurants reviewed by user in session + display them
+            List<Restaurant> reviewedRestaurants = ReviewsRepository.loadReviews().values().stream()
+                .filter(review -> review.getUser() != null && review.getUser().getUsername().equals(user.getUsername()))
+                .map(review -> {
+                    String restaurantId = review.getRestaurant().getId();
+                    return restaurants.stream()
+                        .filter(r -> r.getId().equals(restaurantId))
+                        .findFirst()
+                        .orElse(null);
+                })
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+            setupRestaurantListView(reviewedRestaurants);
+        } else {
+            listPlaceholder.setText("Nessun ristorante trovato per la location selezionata.");
+            displayRestaurants();
+        }
+
     }
 
     /**
