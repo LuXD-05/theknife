@@ -7,6 +7,7 @@ import lombok.Getter;
 import uni.insubria.theknife.model.Restaurant;
 import uni.insubria.theknife.model.User;
 import uni.insubria.theknife.repository.RestaurantRepository;
+import uni.insubria.theknife.model.FilterOptions;
 
 import java.awt.*;
 import java.io.IOException;
@@ -63,6 +64,8 @@ public class SessionService {
      */
     private static final String RESTAURANT_KEY = "restaurant";
 
+    private static final String FILTERS_KEY = "filters";
+
     /**
      * List of all restaurants available in the application.
      * This is loaded once when the class is initialized.
@@ -76,6 +79,13 @@ public class SessionService {
      */
     @Getter
     private static final List<String> locations = restaurants.stream().map(Restaurant::getLocation).collect(Collectors.toSet()).stream().sorted().toList();
+
+    /**
+     * List of all unique cuisines where restaurants are available.
+     * This is derived from the restaurant list and sorted alphabetically.
+     */
+    @Getter
+    private static final List<String> cuisines = restaurants.stream().map(Restaurant::getCuisine).collect(Collectors.toSet()).stream().sorted().toList();
 
     //TODO
     //GITHUB TASK #5 add list of cousine, price, facilities, awars, greenstar
@@ -180,4 +190,17 @@ public class SessionService {
         session.remove(RESTAURANT_KEY);
         session.remove(LOCATION_KEY);
     }
+
+    //#region Filters
+
+    public static void setFilters(FilterOptions filters) {
+        session.put(FILTERS_KEY, filters);
+    }
+
+    public static FilterOptions getFilters() {
+        return (FilterOptions) session.get(FILTERS_KEY);
+    }
+
+    //#endregion
+
 }
