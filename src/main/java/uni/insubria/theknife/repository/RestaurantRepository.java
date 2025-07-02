@@ -10,7 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
+import uni.insubria.theknife.model.FilterOptions;
 import uni.insubria.theknife.model.Restaurant;
+import uni.insubria.theknife.service.SessionService;
 
 /**
  * Repository for managing restaurant data in the TheKnife application.
@@ -202,18 +204,16 @@ public class RestaurantRepository {
             return List.of();
         }
 
-        // If the search query is null or blank, return the original list (no filtering)
-        if (searchQuery == null || searchQuery.trim().isEmpty()) {
-            return restaurants;
-        }
+        FilterOptions filters = SessionService.getFilters();
 
-        // Normalize the search query to lowercase for case-insensitive comparison
-        String queryLower = searchQuery.toLowerCase();
+        // Lowercase query for case-insensitive search
+        String queryLower = (searchQuery != null) ? searchQuery.toLowerCase().trim() : "";
 
-        // Filter the list by checking if each restaurant name contains the query
+        // Return filtered list by query + only if matches filters
         return restaurants.stream()
-                .filter(r -> r.getName().toLowerCase().contains(queryLower))
-                .collect(Collectors.toList());
+            .filter(r -> queryLower.isEmpty() || r.getName().toLowerCase().contains(queryLower))
+            .filter(r -> filters == null || filters.matches(r))
+            .collect(Collectors.toList());
     }
 
 
