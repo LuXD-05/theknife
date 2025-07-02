@@ -212,6 +212,7 @@ public class RestaurantController {
         initializeUserState();
         initializeRatingSelector();
         populateRestaurantDetails();
+
     }
 
     /**
@@ -292,6 +293,10 @@ public class RestaurantController {
                     deleteRestaurant.setVisible(false);
                     break;
             }
+        } else {
+            toggleFavorite.setVisible(false);
+            editRestaurant.setVisible(false);
+            deleteRestaurant.setVisible(false);
         }
 
         if (addReview != null) {
