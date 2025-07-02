@@ -19,24 +19,27 @@
             <Insets top="50" right="20" bottom="50" left="20"/>
         </padding>
     </HBox>
-    <VBox alignment="CENTER" prefHeight="Infinity" prefWidth="600" fillWidth="false" spacing="10.0">
-        <Pane prefHeight="523.0" prefWidth="525.0">
-            <!-- Grouping city and restaurant search in a horizontal layout -->
-            <HBox layoutX="10.0" layoutY="20.0" spacing="20.0" alignment="CENTER_LEFT">
-                <!-- TextField to select city -->
-                <TextField fx:id="selectedLocation" prefHeight="27.0" prefWidth="230.0"
-                        promptText="Seleziona una città"
-                        onKeyReleased="#handleCitySelection"/>
+    <VBox alignment="CENTER" fillWidth="false" spacing="10.0">
+        
+        <!-- Grouping city and restaurant search in a horizontal layout -->
+        <HBox layoutX="10.0" layoutY="20.0" spacing="20.0" alignment="CENTER">
+            
+            <!-- Search bar for restaurant name -->
+            <TextField fx:id="searchField" prefHeight="27.0" prefWidth="230.0" promptText="Cerca un ristorante" onKeyReleased="#handleSearch"/>
 
-                <!-- Search bar for restaurant name -->
-                <TextField fx:id="searchField" prefHeight="27.0" prefWidth="230.0"
-                        promptText="Cerca un ristorante"
-                        onKeyReleased="#handleSearch"/>
-            </HBox>
+            <Button fx:id="openFiltersBtn" onAction="#handleOpenFilters" text="Filtri"/>
+            <Button fx:id="clearFiltersBtn" onAction="#handleClearFilters" text="Rimuovi filtri" />
+            <ToggleButton fx:id="favoritesToggle" onAction="#handleFavoritesToggle"/>
+            <ToggleButton fx:id="reviewedToggle" onAction="#handleReviewedToggle" text="Mostra recensiti"/>
+            
+        </HBox>
 
-            <!-- Restaurant list view -->
-            <ListView fx:id="restaurantListView" layoutX="10.0" layoutY="70.0" prefWidth="500.0" prefHeight="440.0"
-                    onMouseClicked="#handleRestaurantSelection"/>
-        </Pane>
+        <!-- Restaurant list view -->
+        <ListView fx:id="restaurantListView" onMouseClicked="#handleRestaurantSelection" layoutX="10.0" layoutY="70.0" prefWidth="500.0" prefHeight="440.0">
+            <placeholder>
+                <Label fx:id="listPlaceholder" text="Nessun ristorante trovato per la location selezionata."/>
+            </placeholder>
+        </ListView>
+        
     </VBox>
 </VBox>
