@@ -1,14 +1,47 @@
 {
-  "1931659598" : {
-    "id" : "1931659598",
+  "175962144" : {
+    "id" : "175962144",
     "user" : {
-      "username" : "mmordente-cliente"
+      "username" : "lucio-cl"
     },
     "restaurant" : {
       "id" : "811930234"
     },
-    "content" : "Bello",
-    "stars" : 3,
-    "answer" : "grazie"
+    "content" : "Una serata da sogno!",
+    "stars" : 4,
+    "answer" : "Grazie, apprezziamo il suo feedback!"
+  },
+  "644059754" : {
+    "id" : "644059754",
+    "user" : {
+      "username" : "nardo-cl"
+    },
+    "restaurant" : {
+      "id" : "811930234"
+    },
+    "content" : "Un po' deluso dagli antipasti...",
+    "stars" : 2
+  },
+  "1747581928" : {
+    "id" : "1747581928",
+    "user" : {
+      "username" : "mmordente-cli"
+    },
+    "restaurant" : {
+      "id" : "811930234"
+    },
+    "content" : "Bellissima esperienza!",
+    "stars" : 5
+  },
+  "28761801" : {
+    "id" : "28761801",
+    "user" : {
+      "username" : "lucchetto-cl"
+    },
+    "restaurant" : {
+      "id" : "811930234"
+    },
+    "content" : "Ne carne, ne pesce!",
+    "stars" : 3
   }
 }
