@@ -1,6 +1,6 @@
 {
-    "mmordente-ristoratore": {
-        "username": "mmordente-ristoratore",
+    "mmordente-ris": {
+        "username": "mmordente-ris",
         "firstName": "Marcello",
         "lastName": "Mordente",
         "password": "$2a$10$RQTcwtH79uBXdpGcyZYm1ON6U17eKMIGAPg3ExU/Yn8mpFwX1Bvwm",
@@ -34,8 +34,8 @@
             }
         ]
     },
-    "mmordente-cliente": {
-        "username": "mmordente-cliente",
+    "mmordente-cli": {
+        "username": "mmordente-cli",
         "firstName": "Marcello",
         "lastName": "Mordente",
         "password": "$2a$10$MPIABb4FATQ9kgMYpTjvX.E6/KJFZjCxyUVY1gZJJ2GbphConADuW",
@@ -48,31 +48,17 @@
         "role": "CLIENTE",
         "restaurants": []
     },
-    "mmordente": {
-        "username": "mmordente",
-        "firstName": "Marcello",
-        "lastName": "Test",
-        "password": "$2a$10$UswMmGXmBZdWCZv23wC1..2sLS4xGl6M54Ata6yWSKeMksC3bw.CS",
-        "birthDate": [
-            1988,
-            5,
-            3
-        ],
-        "city": "Varese, Italy",
-        "role": "CLIENTE",
-        "restaurants": []
-    },
-    "lucchetto-cl": {
+    "lucchetto-cli": {
         "username": "lucchetto-cl",
         "firstName": "Luca",
         "lastName": "Morosini",
-        "password": "$2a$10$/4BsxvulGKlKoOq.aXnk/ukix0QcFA322wMhfyD3.0rdb0Gilpq22",
+        "password": "$2a$10$RQTcwtH79uBXdpGcyZYm1ON6U17eKMIGAPg3ExU/Yn8mpFwX1Bvwm",
         "birthDate": [
             2005,
             9,
             18
         ],
-        "city": "Orta San Giulio, Italy",
+        "city": "Varese, Italy",
         "role": "CLIENTE",
         "restaurants": []
     },
@@ -80,11 +66,67 @@
         "username": "lucchetto-ris",
         "firstName": "Luca",
         "lastName": "Morosini",
-        "password": "$2a$10$LipXhYc5xYP5LQlKMG7W8uXN7ftW8u9.86jvGIKLwX8dr/2uMnCYe",
+        "password": "$2a$10$RQTcwtH79uBXdpGcyZYm1ON6U17eKMIGAPg3ExU/Yn8mpFwX1Bvwm",
         "birthDate": [
             2005,
             9,
             18
+        ],
+        "city": "Varese, Italy",
+        "role": "RISTORATORE",
+        "restaurants": [{"id": "811930234"}]
+    },
+    "nardo-cli": {
+        "username": "nardo-cl",
+        "firstName": "Luca",
+        "lastName": "Nardo",
+        "password": "$2a$10$RQTcwtH79uBXdpGcyZYm1ON6U17eKMIGAPg3ExU/Yn8mpFwX1Bvwm",
+        "birthDate": [
+            2004,
+            9,
+            11
+        ],
+        "city": "Varese, Italy",
+        "role": "CLIENTE",
+        "restaurants": []
+    },
+    "nardo-ris": {
+        "username": "nardo-ris",
+        "firstName": "Luca",
+        "lastName": "Nardo",
+        "password": "$2a$10$RQTcwtH79uBXdpGcyZYm1ON6U17eKMIGAPg3ExU/Yn8mpFwX1Bvwm",
+        "birthDate": [
+            2004,
+            9,
+            11
+        ],
+        "city": "Varese, Italy",
+        "role": "RISTORATORE",
+        "restaurants": [{"id": "811930234"}]
+    },
+    "lucio-cli": {
+        "username": "lucio-cl",
+        "firstName": "Luciano",
+        "lastName": "Alessio",
+        "password": "$2a$10$RQTcwtH79uBXdpGcyZYm1ON6U17eKMIGAPg3ExU/Yn8mpFwX1Bvwm",
+        "birthDate": [
+            2004,
+            9,
+            11
+        ],
+        "city": "Varese, Italy",
+        "role": "CLIENTE",
+        "restaurants": []
+    },
+    "lucio-ris": {
+        "username": "lucio-ris",
+        "firstName": "Luciano",
+        "lastName": "Alessio",
+        "password": "$2a$10$RQTcwtH79uBXdpGcyZYm1ON6U17eKMIGAPg3ExU/Yn8mpFwX1Bvwm",
+        "birthDate": [
+            2004,
+            9,
+            11
         ],
         "city": "Varese, Italy",
         "role": "RISTORATORE",
