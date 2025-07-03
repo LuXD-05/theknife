@@ -67,3 +67,9 @@
     -fx-border-color: #cccccc;
     -fx-border-radius: 5;
 }
+#favoritesToggle{
+    -fx-background-color: rgba(208, 240, 192, 0.6);
+}
+#reviewedToggle{
+    -fx-background-color: rgba(208, 240, 192, 0.6);
+}
