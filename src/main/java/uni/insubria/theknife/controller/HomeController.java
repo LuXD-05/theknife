@@ -5,9 +5,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import lombok.extern.slf4j.Slf4j;
 
 import org.controlsfx.control.textfield.TextFields;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -107,6 +110,9 @@ public class HomeController {
     private ToggleButton reviewedToggle;
 
     @FXML
+    private Button addRestaurantBtn;
+
+    @FXML
     private Label listPlaceholder;
 
     /**
@@ -153,16 +159,24 @@ public class HomeController {
             favoritesToggle.setText("Mostra preferiti");
             reviewedToggle.setVisible(true);
             reviewedToggle.setManaged(true);
+            addRestaurantBtn.setVisible(false);
+            addRestaurantBtn.setManaged(false);
+
         } else if (role == Role.RISTORATORE) {
             favoritesToggle.setVisible(false);
             favoritesToggle.setManaged(false);
             reviewedToggle.setVisible(false);
             reviewedToggle.setManaged(false);
+            addRestaurantBtn.setVisible(true);
+            addRestaurantBtn.setManaged(true);
+
         } else {
             favoritesToggle.setVisible(false);
             favoritesToggle.setManaged(false);
             reviewedToggle.setVisible(false);
             reviewedToggle.setManaged(false);
+            addRestaurantBtn.setVisible(false);
+            addRestaurantBtn.setManaged(false);
         }
         
     }
@@ -183,6 +197,30 @@ public class HomeController {
         setupRestaurantListView(filteredRestaurants);
         setupSelectionHandler();
     }
+
+
+    private void addNewRestaurantToCurrentUser(Restaurant newRestaurant) {
+    User currentUser = SessionService.getUserFromSession();
+        if (currentUser != null) {
+            // Associa il ristorante all'utente
+            newRestaurant.setUser(currentUser);
+
+            // Aggiungi il ristorante alla collezione dell'utente
+            currentUser.getRestaurants().add(newRestaurant);
+
+            // Aggiorna la sessione con l'utente modificato
+            SessionService.setUserInSession(currentUser);
+
+            // Se vuoi aggiornare la ListView usando displayRestaurants, chiamalo qui
+            displayRestaurants();
+        } else {
+            System.err.println("Nessun utente loggato, impossibile associare il ristorante.");
+        }
+    }
+
+
+
+
 
     /**
      * Finds the reference coordinates for distance calculations based on the current location.
@@ -217,24 +255,18 @@ public class HomeController {
      * @param referenceCoordinates The coordinates to calculate distances from
      * @return A filtered and sorted list of Restaurant objects
      */
-    private List<Restaurant> getFilteredRestaurants(/*Restaurant.Coordinate referenceCoordinates*/) {
-        //! NEW CODE --> always filter
-        FilterOptions filters = SessionService.getFilters();
+    private List<Restaurant> getFilteredRestaurants() {
+        List<Restaurant> all = SessionService.getRestaurants(); // ora prende dati aggiornati
         User user = SessionService.getUserFromSession();
-        return SessionService.getRestaurants().stream()
-            .filter(restaurant -> user == null || !Role.RISTORATORE.equals(user.getRole()) || user.getRestaurants().contains(restaurant))
-            .filter(restaurant -> filters == null || filters.matches(restaurant))
-            //.peek(restaurant -> updateRestaurantDistance(restaurant, referenceCoordinates))
-            .sorted(Comparator.comparing(Restaurant::getName, String.CASE_INSENSITIVE_ORDER)) // Comparator.comparingDouble(Restaurant::getDistance)
+        FilterOptions filters = SessionService.getFilters();
+
+        return all.stream()
+            .filter(r -> user == null || !Role.RISTORATORE.equals(user.getRole()) || user.getRestaurants().contains(r))
+            .filter(r -> filters == null || filters.matches(r))
+            .sorted(Comparator.comparing(Restaurant::getName, String.CASE_INSENSITIVE_ORDER))
             .collect(Collectors.toList());
-            
-        //! OLD CODE --> doesn't always filter
-        // return SessionService.getRestaurants().stream()
-        //         .filter(restaurant -> SessionService.getUserFromSession() == null || !Role.RISTORATORE.equals(SessionService.getUserFromSession().getRole()) || SessionService.getUserFromSession().getRestaurants().contains(restaurant))
-        //         .peek(restaurant -> updateRestaurantDistance(restaurant, referenceCoordinates))
-        //         .sorted(Comparator.comparingDouble(Restaurant::getDistance))
-        //         .collect(Collectors.toList());
     }
+
 
     /**
      * Updates the distance property of a restaurant based on reference coordinates.
@@ -481,4 +513,142 @@ public class HomeController {
             SessionService.clearUserSession();
         }
     }
+
+
+    //#region HANDLE ADD RESTAURANTS
+    @FXML
+    private void handleAddRestaurant() {
+        // Create a dialog window for new restaurant data input
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Add New Restaurant");
+        dialog.setHeaderText("Enter new restaurant details");
+
+        // Create empty input fields
+        TextField nameField = new TextField();
+        TextField addressField = new TextField();
+        TextField locationField = new TextField();
+        TextField phoneField = new TextField();
+        TextField cuisineField = new TextField();
+        TextField websiteField = new TextField();
+
+        TextField priceField = new TextField();
+        TextField longitudeField = new TextField();
+        TextField latitudeField = new TextField();
+        TextField awardField = new TextField();
+        TextField greenStarField = new TextField();
+        TextArea descriptionArea = new TextArea();
+        descriptionArea.setPrefRowCount(4);
+
+        // Layout the fields in a grid
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        grid.add(new Label("Name:"), 0, 0);
+        grid.add(nameField, 1, 0);
+        grid.add(new Label("Address:"), 0, 1);
+        grid.add(addressField, 1, 1);
+        grid.add(new Label("Location:"), 0, 2);
+        grid.add(locationField, 1, 2);
+        grid.add(new Label("Phone:"), 0, 3);
+        grid.add(phoneField, 1, 3);
+        grid.add(new Label("Cuisine:"), 0, 4);
+        grid.add(cuisineField, 1, 4);
+        grid.add(new Label("Website URL:"), 0, 5);
+        grid.add(websiteField, 1, 5);
+
+        grid.add(new Label("Price:"), 0, 6);
+        grid.add(priceField, 1, 6);
+        grid.add(new Label("Longitude:"), 0, 7);
+        grid.add(longitudeField, 1, 7);
+        grid.add(new Label("Latitude:"), 0, 8);
+        grid.add(latitudeField, 1, 8);
+        grid.add(new Label("Award:"), 0, 9);
+        grid.add(awardField, 1, 9);
+        grid.add(new Label("Green Star:"), 0, 10);
+        grid.add(greenStarField, 1, 10);
+        grid.add(new Label("Description:"), 0, 11);
+        grid.add(descriptionArea, 1, 11);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    // Create new restaurant object and set fields
+                    Restaurant newRestaurant = new Restaurant();
+
+                    newRestaurant.setName(nameField.getText());
+                    newRestaurant.setAddress(addressField.getText());
+                    newRestaurant.setLocation(locationField.getText());
+                    newRestaurant.setPhone(phoneField.getText());
+                    newRestaurant.setCuisine(cuisineField.getText());
+                    newRestaurant.setWebsiteUrl(websiteField.getText());
+                    newRestaurant.setPrice(priceField.getText());
+
+                    // Parse floats and integer with validation
+                    if (!longitudeField.getText().isBlank())
+                        newRestaurant.setLongitude(Float.parseFloat(longitudeField.getText().trim()));
+
+                    if (!latitudeField.getText().isBlank())
+                        newRestaurant.setLatitude(Float.parseFloat(latitudeField.getText().trim()));
+
+                    newRestaurant.setAward(awardField.getText());
+
+                    if (!greenStarField.getText().isBlank())
+                        newRestaurant.setGreenStar(Integer.parseInt(greenStarField.getText().trim()));
+
+                    newRestaurant.setDescription(descriptionArea.getText());
+
+                    // Generate a unique id based on name, latitude, longitude (same logic as in repository)
+                    String id = String.valueOf(Objects.hash(
+                        newRestaurant.getName(),
+                        newRestaurant.getLatitude(),
+                        newRestaurant.getLongitude()
+                    ));
+                    newRestaurant.setId(id);
+
+                    // Add new restaurant to repository
+                    RestaurantRepository.ERROR_CODE result = RestaurantRepository.addRestaurant(newRestaurant);
+
+                    if (result == RestaurantRepository.ERROR_CODE.NONE) {
+                        // Associa il nuovo ristorante all'utente corrente
+                        addNewRestaurantToCurrentUser(newRestaurant);
+
+                        // Load updated map
+                        Map<String, Restaurant> updatedRestaurantsMap = RestaurantRepository.loadRestaurants();
+
+                        // Convert map to list
+                        List<Restaurant> updatedRestaurantsList = new ArrayList<>(updatedRestaurantsMap.values());
+
+                        // Update SessionService with the list
+                        SessionService.setRestaurants(updatedRestaurantsList);
+
+                        // Update the selected restaurant in session if needed
+                        SessionService.setRestaurantInSession(newRestaurant);
+
+                        // Refresh the UI list view
+                        displayRestaurants();
+
+                        Alert info = new Alert(Alert.AlertType.INFORMATION, "New restaurant added successfully!");
+                        info.showAndWait();
+                    } else if (result == RestaurantRepository.ERROR_CODE.DUPLICATED) {
+                        Alert warn = new Alert(Alert.AlertType.WARNING, "A restaurant with these details already exists.");
+                        warn.showAndWait();
+                    } else {
+                        Alert error = new Alert(Alert.AlertType.ERROR, "Failed to add new restaurant due to a service error.");
+                        error.showAndWait();
+                    }
+                } catch (NumberFormatException e) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Invalid number format for longitude, latitude or green star.");
+                    errorAlert.showAndWait();
+                }
+            }
+        });
+    }
+
+    
+    //#endregion
 }

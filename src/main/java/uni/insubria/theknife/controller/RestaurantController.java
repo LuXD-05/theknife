@@ -5,13 +5,20 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import uni.insubria.theknife.model.Restaurant;
 import uni.insubria.theknife.model.Review;
 import uni.insubria.theknife.model.Role;
 import uni.insubria.theknife.model.User;
+import uni.insubria.theknife.repository.RestaurantRepository;
 import uni.insubria.theknife.repository.ReviewsRepository;
 import uni.insubria.theknife.service.AlertService;
 import uni.insubria.theknife.service.SessionService;
@@ -977,19 +984,230 @@ public class RestaurantController {
 
     //#region Restaurant CRUD
 
+    /**
+     * 
+     */
     @FXML
-    public void handleEditRestaurant() {
+    private void handleEditRestaurant() {
 
+        Optional<Restaurant> optRestaurant = SessionService.getRestaurantFromSession();
 
+        if (optRestaurant.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "No restaurant selected to edit.");
+            alert.showAndWait();
+            return;
+        }
 
+        Restaurant restaurant = optRestaurant.get();
+
+        if (restaurant == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "No restaurant selected to edit.");
+            alert.showAndWait();
+            return;
+        }
+
+        // Create a dialog window with custom content
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Edit Restaurant");
+        dialog.setHeaderText("Modify the restaurant details");
+
+        // Create fields pre-filled with current restaurant data
+        TextField nameField = new TextField(restaurant.getName());
+        TextField addressField = new TextField(restaurant.getAddress());
+        TextField locationField = new TextField(restaurant.getLocation());
+        TextField phoneField = new TextField(restaurant.getPhone());
+        TextField cuisineField = new TextField(restaurant.getCuisine());
+        TextField websiteField = new TextField(restaurant.getWebsiteUrl());
+
+        TextField priceField = new TextField(restaurant.getPrice());
+        TextField longitudeField = new TextField(restaurant.getLongitude() != null ? restaurant.getLongitude().toString() : "");
+        TextField latitudeField = new TextField(restaurant.getLatitude() != null ? restaurant.getLatitude().toString() : "");
+        TextField awardField = new TextField(restaurant.getAward());
+        TextField greenStarField = new TextField(restaurant.getGreenStar() != null ? restaurant.getGreenStar().toString() : "");
+        TextArea descriptionArea = new TextArea(restaurant.getDescription());
+        descriptionArea.setPrefRowCount(4);
+
+        // Layout the fields vertically
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        grid.add(new Label("Name:"), 0, 0);
+        grid.add(nameField, 1, 0);
+        grid.add(new Label("Address:"), 0, 1);
+        grid.add(addressField, 1, 1);
+        grid.add(new Label("Location:"), 0, 2);
+        grid.add(locationField, 1, 2);
+        grid.add(new Label("Phone:"), 0, 3);
+        grid.add(phoneField, 1, 3);
+        grid.add(new Label("Cuisine:"), 0, 4);
+        grid.add(cuisineField, 1, 4);
+        grid.add(new Label("Website URL:"), 0, 5);
+        grid.add(websiteField, 1, 5);
+
+        grid.add(new Label("Price:"), 0, 6);
+        grid.add(priceField, 1, 6);
+        grid.add(new Label("Longitude:"), 0, 7);
+        grid.add(longitudeField, 1, 7);
+        grid.add(new Label("Latitude:"), 0, 8);
+        grid.add(latitudeField, 1, 8);
+        grid.add(new Label("Award:"), 0, 9);
+        grid.add(awardField, 1, 9);
+        grid.add(new Label("Green Star (0 or 1):"), 0, 10);
+        grid.add(greenStarField, 1, 10);
+        grid.add(new Label("Description:"), 0, 11);
+        grid.add(descriptionArea, 1, 11);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Add buttons
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        // Show dialog and wait for result
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    // --- VALIDAZIONI ---
+
+                    // 1) Location: nessun numero consentito
+                    if (locationField.getText().matches(".*\\d.*")) {
+                        throw new IllegalArgumentException("Location cannot contain numbers.");
+                    }
+
+                    // 2) Latitudine: numero float tra -90 e 90
+                    Float lat = null;
+                    if (!latitudeField.getText().isBlank()) {
+                        lat = Float.parseFloat(latitudeField.getText().trim());
+                        if (lat < -90f || lat > 90f) {
+                            throw new IllegalArgumentException("Latitude must be between -90 and 90.");
+                        }
+                    }
+
+                    // 3) Longitudine: numero float tra -180 e 180
+                    Float lon = null;
+                    if (!longitudeField.getText().isBlank()) {
+                        lon = Float.parseFloat(longitudeField.getText().trim());
+                        if (lon < -180f || lon > 180f) {
+                            throw new IllegalArgumentException("Longitude must be between -180 and 180.");
+                        }
+                    }
+
+                    // 4) Numero di telefono internazionale (esempio regex)
+                    String phoneRegex = "^\\+?[0-9. ()-]{7,25}$";
+                    if (!phoneField.getText().isBlank() && !phoneField.getText().matches(phoneRegex)) {
+                        throw new IllegalArgumentException("Invalid international phone number format.");
+                    }
+
+                    // 5) URL sito web semplice (esempio regex per http(s)://...)
+                    String urlRegex = "^(https?://)?([\\w.-]+)\\.([a-z]{2,6})([/\\w .-]*)*/?$";
+                    if (!websiteField.getText().isBlank() && !websiteField.getText().matches(urlRegex)) {
+                        throw new IllegalArgumentException("Invalid website URL format.");
+                    }
+
+                    // 6) Green Star: solo 0 o 1
+                    Integer greenStar = null;
+                    if (!greenStarField.getText().isBlank()) {
+                        greenStar = Integer.parseInt(greenStarField.getText().trim());
+                        if (greenStar != 0 && greenStar != 1) {
+                            throw new IllegalArgumentException("Green Star must be 0 or 1.");
+                        }
+                    }
+
+                    // --- SE ARRIVATO QUI, TUTTO OK ---
+
+                    // Aggiorna i campi del ristorante
+                    restaurant.setName(nameField.getText());
+                    restaurant.setAddress(addressField.getText());
+                    restaurant.setLocation(locationField.getText());
+                    restaurant.setPhone(phoneField.getText());
+                    restaurant.setCuisine(cuisineField.getText());
+                    restaurant.setWebsiteUrl(websiteField.getText());
+                    restaurant.setPrice(priceField.getText());
+                    restaurant.setLongitude(lon);
+                    restaurant.setLatitude(lat);
+                    restaurant.setAward(awardField.getText());
+                    restaurant.setGreenStar(greenStar);
+                    restaurant.setDescription(descriptionArea.getText());
+
+                    // Salva modifiche repository
+                    RestaurantRepository.editRestaurant(restaurant);
+
+                    // Aggiorna sessione e UI
+                    SessionService.setRestaurantInSession(restaurant);
+                    reloadRestaurantView();
+
+                    Alert savedAlert = new Alert(Alert.AlertType.INFORMATION, "Restaurant information updated successfully!");
+                    savedAlert.showAndWait();
+
+                } catch (NumberFormatException e) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Invalid number format for longitude, latitude or green star.");
+                    errorAlert.showAndWait();
+                } catch (IllegalArgumentException e) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+                    errorAlert.showAndWait();
+                }
+            }
+        });
     }
 
+
+
+    
+    /**
+     * 
+     */
     @FXML
-    public void handleDeleteRestaurant() {
+    private void handleDeleteRestaurant(ActionEvent event) {
 
+        Restaurant restaurant = validateRestaurant();
 
-        
+        if (restaurant == null) {
+            // Nessun ristorante da eliminare, esci
+            return;
+        }
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Delete");
+        alert.setHeaderText("Delete restaurant");
+        alert.setContentText("Are you sure you want to delete '" + restaurant.getName() + "'?");
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                // Prova a cancellare il ristorante
+                RestaurantRepository.ERROR_CODE result = RestaurantRepository.deleteRestaurant(restaurant);
+                if (result == RestaurantRepository.ERROR_CODE.NONE) {
+                    // Cancellazione avvenuta con successo
+                    // Torna indietro passando l'evento al metodo handleBack
+                    SessionService.clearRestaurants();
+                    handleBack();
+                } else {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setTitle("Error");
+                    errorAlert.setHeaderText("Could not delete restaurant");
+                    errorAlert.setContentText("An error occurred while deleting the restaurant.");
+                    errorAlert.showAndWait();
+                }
+            }
+        });
     }
+
+
+
+    /**
+     * 
+     */
+    @FXML
+    private void reloadRestaurantView() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/restaurant.fxml"));
+            // Ricarichi la scena dal file FXML
+            SessionService.setSceneInSession(fxmlLoader);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     //#endregion
 }
