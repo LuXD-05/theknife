@@ -25,6 +25,8 @@ import java.util.Optional;
 import javafx.geometry.Insets;
 import uni.insubria.theknife.repository.UserRepository;
 
+import static uni.insubria.theknife.util.Messages.*;
+
 /**
  * Controller for the restaurant detail screen of the TheKnife application.
  * <p>
@@ -80,31 +82,6 @@ public class RestaurantController {
      * The review currently being edited.
      */
     private Review currentlyEditingReview;
-
-    /**
-     * Message displayed when a user tries to add a review without being logged in.
-     */
-    private static final String LOGIN_PROMPT = "Please login to add a review";
-
-    /**
-     * Title for alerts shown when required information is missing.
-     */
-    private static final String MISSING_INFO_TITLE = "Missing Information";
-
-    /**
-     * Message displayed when a user tries to submit a review without content or rating.
-     */
-    private static final String REVIEW_VALIDATION_MESSAGE = "Please provide both a review and a rating.";
-
-    /**
-     * Message displayed when a user cannot be found in the session.
-     */
-    private static final String USER_NOT_FOUND_MESSAGE = "User not found.";
-
-    /**
-     * Message displayed when a restaurant cannot be found in the session.
-     */
-    private static final String RESTAURANT_NOT_FOUND_MESSAGE = "Restaurant not found.";
 
     /**
      * Labels for displaying basic restaurant information.

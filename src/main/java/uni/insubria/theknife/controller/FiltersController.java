@@ -32,8 +32,10 @@ import javafx.geometry.Side;
 import uni.insubria.theknife.model.FilterOptions;
 import uni.insubria.theknife.repository.UserRepository;
 
-/**
+import static uni.insubria.theknife.util.Messages.*;
 
+/**
+ *
  */
 public class FiltersController {
     /**
@@ -47,26 +49,26 @@ public class FiltersController {
     public FiltersController() {
         // Default constructor required by FXML loader
     }
-    
-    @FXML 
+
+    @FXML
     private Label welcomeLabel;
 
-    @FXML 
+    @FXML
     private TextField cuisineField;
-    
-    @FXML 
+
+    @FXML
     private TextField locationField;
-    
-    @FXML 
+
+    @FXML
     private ComboBox<String> priceCombo;
-    
-    @FXML 
+
+    @FXML
     private ComboBox<String> starsCombo;
-    
-    @FXML 
+
+    @FXML
     private CheckBox deliveryCheck;
-    
-    @FXML 
+
+    @FXML
     private CheckBox onlineBookingCheck;
 
     /**
@@ -88,14 +90,14 @@ public class FiltersController {
         TextFields.bindAutoCompletion(cuisineField, param -> {
             String userText = param.getUserText().toLowerCase();
             return SessionService.getCuisines().stream()
-                .filter(c -> c.toLowerCase().contains(userText))
-                .collect(Collectors.toList());
+                    .filter(c -> c.toLowerCase().contains(userText))
+                    .collect(Collectors.toList());
         });
         TextFields.bindAutoCompletion(locationField, param -> {
             String userText = param.getUserText().toLowerCase();
             return SessionService.getLocations().stream()
-                .filter(l -> l.toLowerCase().contains(userText))
-                .collect(Collectors.toList());
+                    .filter(l -> l.toLowerCase().contains(userText))
+                    .collect(Collectors.toList());
         });
 
         // Cuisine
@@ -158,7 +160,7 @@ public class FiltersController {
      * title and content. The header text is set to null for a cleaner appearance.
      * </p>
      *
-     * @param title The title text for the alert dialog
+     * @param title   The title text for the alert dialog
      * @param content The content text for the alert dialog
      */
     private void showAlert(String title, String content) {
@@ -211,7 +213,6 @@ public class FiltersController {
             SessionService.clearUserSession();
         }
     }
-
 
 
     @FXML
