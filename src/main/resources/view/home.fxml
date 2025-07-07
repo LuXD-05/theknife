@@ -41,5 +41,9 @@
             </placeholder>
         </ListView>
         
+
+        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+            <Button fx:id="addRestaurantBtn" text="Add" onAction="#handleAddRestaurant" style="-fx-font-size: 16px;"/>
+        </HBox>
     </VBox>
 </VBox>
