@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" prefHeight="Infinity" prefWidth="Infinity" fillWidth="false" spacing="10.0" xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="uni.insubria.theknife.controller.LoginController" 
+      stylesheets="@style.css" styleClass="v-box">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    </padding>
+    <VBox spacing="10" alignment="CENTER">
+        <TextField fx:id="usernameTextField" layoutX="172.0" layoutY="20.0" prefHeight="27.0" prefWidth="300.0"
+                   promptText="Username"/>
+        <PasswordField fx:id="passwordTextField" layoutX="172.0" layoutY="56.0" prefHeight="27.0" prefWidth="300.0"
+                   promptText="Password"/>
+        <Button layoutX="172.0" layoutY="102.0" onAction="#onLoginButtonClick" prefHeight="27.0" prefWidth="300.0"
+                text="Accedi"/>
+        <Button layoutX="172.0" layoutY="138.0" onAction="#onRegisterButtonClick" prefHeight="27.0" prefWidth="300.0"
+                text="Registrati"/>
+    </VBox>
+
+    <Label text="oppure"/>
+    <VBox spacing="10" alignment="CENTER">
+          <TextField fx:id="cityTextField" layoutX="172.0" prefHeight="27.0" prefWidth="300.0"
+                     promptText="Seleziona una città"/>
+            <Button layoutX="172.0" layoutY="46.0" onAction="#onGuestButtonClick" prefHeight="27.0" prefWidth="300.0"
+                    text="Guest"/>
+    </VBox>
+</VBox>

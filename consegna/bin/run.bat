@@ -1,0 +1,1 @@
+java -jar win-theknife.jar

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ComboBox?>
+
+<VBox xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="uni.insubria.theknife.controller.HomeController"
+      prefHeight="Infinity" spacing="10.0"
+      stylesheets="@style.css" styleClass="v-box">
+    <HBox alignment="CENTER" spacing="50.0">
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="welcomeLabel"/>
+        <Button onAction="#handleLogout" text="Logout"/>
+        <padding>
+            <Insets top="50" right="20" bottom="50" left="20"/>
+        </padding>
+    </HBox>
+    <VBox alignment="CENTER" fillWidth="false" spacing="10.0">
+        
+        <!-- Grouping city and restaurant search in a horizontal layout -->
+        <HBox layoutX="10.0" layoutY="20.0" spacing="20.0" alignment="CENTER">
+            
+            <!-- Search bar for restaurant name -->
+            <TextField fx:id="searchField" prefHeight="27.0" prefWidth="230.0" promptText="Cerca un ristorante" onKeyReleased="#handleSearch"/>
+
+            <Button fx:id="openFiltersBtn" onAction="#handleOpenFilters" text="Filtri"/>
+            <Button fx:id="clearFiltersBtn" onAction="#handleClearFilters" text="Rimuovi filtri" />
+            <ToggleButton fx:id="favoritesToggle" onAction="#handleFavoritesToggle"/>
+            <ToggleButton fx:id="reviewedToggle" onAction="#handleReviewedToggle" text="Mostra recensiti"/>
+            
+        </HBox>
+
+        <!-- Restaurant list view -->
+        <ListView fx:id="restaurantListView" onMouseClicked="#handleRestaurantSelection" layoutX="10.0" layoutY="70.0" prefWidth="500.0" prefHeight="440.0">
+            <placeholder>
+                <Label fx:id="listPlaceholder" text="Nessun ristorante trovato per la location selezionata."/>
+            </placeholder>
+        </ListView>
+        
+
+        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+            <Button fx:id="addRestaurantBtn" text="Add" onAction="#handleAddRestaurant" style="-fx-font-size: 16px;"/>
+        </HBox>
+    </VBox>
+</VBox>

@@ -1,0 +1,1 @@
+java -jar macOS-theknife.jar

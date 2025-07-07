@@ -1,0 +1,75 @@
+.v-box {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%,
+    #2d5941 0%,
+    #4fa66a 25%,
+    #6fcf97 50%,
+    #a3d9a5 75%,
+    #d0f0c0 100%);
+}
+
+.text-field {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-border-color: transparent transparent #ffc13d transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-prompt-text-fill: #16161D;
+}
+
+.date-picker {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    /* -fx-border-color: transparent transparent #ffc13d transparent; 
+    -fx-border-width: 0 0 2 0;  */
+    -fx-prompt-text-fill: #16161D;
+}
+
+.button {
+    -fx-background-color: rgba(208, 240, 192, 0.6);
+    -fx-text-fill: #16161D;
+    -fx-cursor: hand;
+}
+
+.password-field {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-border-color: transparent transparent #ffc13d transparent;
+    -fx-border-width: 0 0 2 0;
+    -fx-prompt-text-fill: #16161D;
+}
+
+.label-bold {
+    -fx-font-weight: bold;
+    -fx-min-width: 100px;
+}
+
+.section-header {
+}
+.review-user {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.review-stars {
+    -fx-text-fill: gold;
+    -fx-font-size: 14px;
+}
+
+.review-content {
+    -fx-font-size: 13px;
+}
+
+.review-answer {
+    -fx-font-size: 13px;
+    -fx-font-style: italic;
+    -fx-padding: 5 0 0 15;
+}
+
+.review-summary-box {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-radius: 5;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 5;
+}
+#favoritesToggle{
+    -fx-background-color: rgba(208, 240, 192, 0.6);
+}
+#reviewedToggle{
+    -fx-background-color: rgba(208, 240, 192, 0.6);
+}

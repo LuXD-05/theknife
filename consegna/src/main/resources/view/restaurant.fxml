@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
+<VBox xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="uni.insubria.theknife.controller.RestaurantController"
+      prefHeight="Infinity" spacing="10.0"
+      stylesheets="@style.css" styleClass="v-box">
+    <HBox alignment="CENTER" spacing="50.0">
+        <Button fx:id="backButton" onMouseClicked="#handleBack" text="Back"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="welcomeLabel"/>
+        <Button onAction="#handleLogout" text="Logout"/>
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+    </HBox>
+    <HBox alignment="CENTER" spacing="30.0">
+        <padding>
+            <Insets right="20" left="20"/>
+        </padding>
+        <VBox alignment="TOP_LEFT" prefHeight="Infinity" prefWidth="600" spacing="15">
+            <ScrollPane fitToWidth="true" minHeight="500" VBox.vgrow="ALWAYS">
+                <GridPane fx:id="restaurantGridPane" hgap="10" vgap="5">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+
+                    <Label text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="label-bold"/>
+                    <Label fx:id="nameLabel" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                    <Label text="Description:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="label-bold"/>
+                    <Label fx:id="descriptionLabel" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                    <Label text="Address:" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="label-bold"/>
+                    <Label fx:id="addressLabel" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                    <Label text="Price:" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="label-bold"/>
+                    <Label fx:id="priceLabel" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                    <Label text="Cuisine:" GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="label-bold"/>
+                    <Label fx:id="cuisineLabel" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+                    <Label text="Phone:" GridPane.columnIndex="0" GridPane.rowIndex="5" styleClass="label-bold"/>
+                    <Label fx:id="phoneLabel" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+
+                    <Label text="Website:" GridPane.columnIndex="0" GridPane.rowIndex="6" styleClass="label-bold"/>
+                    <Label fx:id="websiteUrlLabel" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+
+                    <Label text="Award:" GridPane.columnIndex="0" GridPane.rowIndex="7" styleClass="label-bold"/>
+                    <Label fx:id="awardLabel" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+
+                    <Label text="Green Star:" GridPane.columnIndex="0" GridPane.rowIndex="8" styleClass="label-bold"/>
+                    <Label fx:id="greenStarLabel" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+
+                    <Label text="Facilities:" GridPane.columnIndex="0" GridPane.rowIndex="9" styleClass="label-bold"/>
+                    <Label fx:id="facilitiesLabel" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="9"/>
+
+                    <Label text="Location:" GridPane.columnIndex="0" GridPane.rowIndex="10" styleClass="label-bold"/>
+                    <VBox GridPane.columnIndex="1" GridPane.rowIndex="10" spacing="5">
+                        <Label text="Longitude:" styleClass="label-bold"/>
+                        <Label fx:id="longitudeLabel"/>
+                        <Label text="Latitude:" styleClass="label-bold"/>
+                        <Label fx:id="latitudeLabel"/>
+                    </VBox>
+
+                    <Label text="Michelin URL:" GridPane.columnIndex="0" GridPane.rowIndex="11"
+                           styleClass="label-bold"/>
+                    <Label fx:id="michelinUrlLabel" GridPane.columnIndex="1" GridPane.rowIndex="11"/>
+
+                </GridPane>
+            </ScrollPane>
+        </VBox>
+        <VBox alignment="TOP_CENTER" prefHeight="Infinity" prefWidth="400" spacing="10">
+            <VBox styleClass="review-summary-box" spacing="5" alignment="CENTER">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+                <HBox spacing="10" alignment="CENTER">
+                    <Label text="Total Reviews:" styleClass="label-bold"/>
+                    <Label fx:id="totalReviewsLabel"/>
+                </HBox>
+                <HBox spacing="10" alignment="CENTER">
+                    <Label text="Average Rating:" styleClass="label-bold"/>
+                    <Label fx:id="averageRatingLabel"/>
+                </HBox>
+            </VBox>
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+                <ListView fx:id="reviewsListView" prefWidth="380"/>
+            </ScrollPane>
+            <VBox fx:id="addReviewBox" spacing="5">
+                <TextField fx:id="reviewContent" promptText="Valuta il ristorante..."/>
+                <ComboBox fx:id="ratingSelector" promptText="Select rating (1-5 stars)"/>
+                <Button fx:id="addReview" onAction="#handleAddReview" text="Add review"/>
+                <Label fx:id="registerMessage" visible="false"/>
+            </VBox>
+            <VBox fx:id="editReviewBox" visible="false" spacing="5">
+                <TextField fx:id="editReviewContent" promptText="Edit your review..."/>
+                <ComboBox fx:id="editRatingSelector" promptText="Select rating (1-5 stars)"/>
+                <HBox spacing="5.0">
+                    <Button text="Save" onAction="#handleSaveEditedReview"/>
+                    <Button text="Cancel" onAction="#handleCancelEdit"/>
+                </HBox>
+            </VBox>
+            <HBox fx:id="restaurantActionBox" alignment="CENTER" spacing="10">
+                <Button fx:id="toggleFavorite" text="☆" onAction="#handleToggleFavoriteRestaurant" style="-fx-font-size: 16px;"/>
+                <Button fx:id="editRestaurant" text="Edit" onAction="#handleEditRestaurant" style="-fx-font-size: 16px;"/>
+                <Button fx:id="deleteRestaurant" text="Delete" onAction="#handleDeleteRestaurant" style="-fx-font-size: 16px;"/>
+                <padding>
+                    <Insets top="10"/>
+                </padding>
+            </HBox>
+        </VBox>
+    </HBox>
+</VBox>
