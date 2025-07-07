@@ -1,1 +1,1 @@
-java -jar Win-theknife.jar
+java -jar win-theknife.jar
