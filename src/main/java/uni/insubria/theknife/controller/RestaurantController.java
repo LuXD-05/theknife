@@ -1,3 +1,9 @@
+/* 
+Mordente Marcello 761730 VA
+Luciano Alessio 759956 VA
+Nardo Luca 761132 VA
+Morosini Luca 760029 VA
+*/
 package uni.insubria.theknife.controller;
 
 import javafx.collections.FXCollections;
@@ -169,7 +175,7 @@ public class RestaurantController {
 
     @FXML
     private Button deleteRestaurant;
-    
+
     /**
      * Observable list of reviews for binding to the reviews list view.
      */
@@ -1070,39 +1076,63 @@ public class RestaurantController {
                 try {
                     // --- VALIDAZIONI ---
 
+                    if (nameField.getText().isBlank()) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Name is mandatory.");
+                        errorAlert.showAndWait();
+                        return;
+                    }
+
                     // 1) Location: nessun numero consentito
                     if (locationField.getText().matches(".*\\d.*")) {
-                        throw new IllegalArgumentException("Location cannot contain numbers.");
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Location cannot contain numbers.");
+                        errorAlert.showAndWait();
+                        return;
                     }
 
                     // 2) Latitudine: numero float tra -90 e 90
                     Float lat = null;
-                    if (!latitudeField.getText().isBlank()) {
+                    if (latitudeField.getText().isBlank()) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Latitude is mandatory.");
+                        errorAlert.showAndWait();
+                        return;
+                    } else {
                         lat = Float.parseFloat(latitudeField.getText().trim());
                         if (lat < -90f || lat > 90f) {
-                            throw new IllegalArgumentException("Latitude must be between -90 and 90.");
+                            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Latitude must be between -90 and 90.");
+                            errorAlert.showAndWait();
+                            return;
                         }
                     }
 
                     // 3) Longitudine: numero float tra -180 e 180
                     Float lon = null;
-                    if (!longitudeField.getText().isBlank()) {
+                    if (longitudeField.getText().isBlank()) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Longitude is mandatory.");
+                        errorAlert.showAndWait();
+                        return;
+                    } else {
                         lon = Float.parseFloat(longitudeField.getText().trim());
                         if (lon < -180f || lon > 180f) {
-                            throw new IllegalArgumentException("Longitude must be between -180 and 180.");
+                            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Longitude must be between -180 and 180.");
+                            errorAlert.showAndWait();
+                            return;
                         }
                     }
 
                     // 4) Numero di telefono internazionale (esempio regex)
                     String phoneRegex = "^\\+?[0-9. ()-]{7,25}$";
                     if (!phoneField.getText().isBlank() && !phoneField.getText().matches(phoneRegex)) {
-                        throw new IllegalArgumentException("Invalid international phone number format.");
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Invalid international phone number format.");
+                        errorAlert.showAndWait();
+                        return;
                     }
 
                     // 5) URL sito web semplice (esempio regex per http(s)://...)
                     String urlRegex = "^(https?://)?([\\w.-]+)\\.([a-z]{2,6})([/\\w .-]*)*/?$";
                     if (!websiteField.getText().isBlank() && !websiteField.getText().matches(urlRegex)) {
-                        throw new IllegalArgumentException("Invalid website URL format.");
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Invalid website URL format.");
+                        errorAlert.showAndWait();
+                        return;
                     }
 
                     // 6) Green Star: solo 0 o 1
@@ -1110,7 +1140,9 @@ public class RestaurantController {
                     if (!greenStarField.getText().isBlank()) {
                         greenStar = Integer.parseInt(greenStarField.getText().trim());
                         if (greenStar != 0 && greenStar != 1) {
-                            throw new IllegalArgumentException("Green Star must be 0 or 1.");
+                            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Green Star must be 0 or 1.");
+                            errorAlert.showAndWait();
+                            return;
                         }
                     }
 
@@ -1153,7 +1185,7 @@ public class RestaurantController {
 
 
 
-    
+
     /**
      * 
      */

@@ -1,3 +1,9 @@
+/* 
+Mordente Marcello 761730 VA
+Luciano Alessio 759956 VA
+Nardo Luca 761132 VA
+Morosini Luca 760029 VA
+*/
 package uni.insubria.theknife;
 
 import javafx.application.Application;
@@ -43,7 +49,7 @@ public class Launcher extends Application {
      */
     @Override
     public void start(Stage stage) throws IOException {
-        
+
         SessionService.setFilters(new FilterOptions());
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/login.fxml"));
         stage.setTitle("TheKnife");

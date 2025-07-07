@@ -1,3 +1,9 @@
+/* 
+Mordente Marcello 761730 VA
+Luciano Alessio 759956 VA
+Nardo Luca 761132 VA
+Morosini Luca 760029 VA
+*/
 package uni.insubria.theknife.controller;
 
 import javafx.collections.FXCollections;
@@ -63,6 +69,7 @@ public class HomeController {
     public HomeController() {
         // Default constructor required by FXML loader
     }
+
     /**
      * Path to the restaurant detail view FXML file.
      */
@@ -122,7 +129,7 @@ public class HomeController {
      */
     @FXML
     private void initialize() {
-        
+
         initializeUserState();
         displayRestaurants();
 
@@ -178,7 +185,7 @@ public class HomeController {
             addRestaurantBtn.setVisible(false);
             addRestaurantBtn.setManaged(false);
         }
-        
+
     }
 
     /**
@@ -200,7 +207,7 @@ public class HomeController {
 
 
     private void addNewRestaurantToCurrentUser(Restaurant newRestaurant) {
-    User currentUser = SessionService.getUserFromSession();
+        User currentUser = SessionService.getUserFromSession();
         if (currentUser != null) {
             // Associa il ristorante all'utente
             newRestaurant.setUser(currentUser);
@@ -217,9 +224,6 @@ public class HomeController {
             System.err.println("Nessun utente loggato, impossibile associare il ristorante.");
         }
     }
-
-
-
 
 
     /**
@@ -261,10 +265,10 @@ public class HomeController {
         FilterOptions filters = SessionService.getFilters();
 
         return all.stream()
-            .filter(r -> user == null || !Role.RISTORATORE.equals(user.getRole()) || user.getRestaurants().contains(r))
-            .filter(r -> filters == null || filters.matches(r))
-            .sorted(Comparator.comparing(Restaurant::getName, String.CASE_INSENSITIVE_ORDER))
-            .collect(Collectors.toList());
+                .filter(r -> user == null || !Role.RISTORATORE.equals(user.getRole()) || user.getRestaurants().contains(r))
+                .filter(r -> filters == null || filters.matches(r))
+                .sorted(Comparator.comparing(Restaurant::getName, String.CASE_INSENSITIVE_ORDER))
+                .collect(Collectors.toList());
     }
 
 
@@ -305,14 +309,14 @@ public class HomeController {
         restaurantListView.setCellFactory(this::createRestaurantCell);
     }
 
-    
+
     // TextField used to capture the user's input for restaurant name search
     @FXML
     private TextField searchField;
 
     /**
      * Handles the real-time search of restaurants based on user input in the search field.
-     * 
+     * <p>
      * This method is triggered every time a key is released inside the search TextField.
      * It filters the currently visible list of restaurants by matching the input text
      * with the restaurant names (case-insensitive). If the input is empty, it resets
@@ -422,7 +426,7 @@ public class HomeController {
     }
 
     @FXML
-    public void handleOpenFilters() throws IOException{
+    public void handleOpenFilters() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(FILTERS_VIEW_PATH));
         SessionService.setSceneInSession(fxmlLoader);
     }
@@ -443,7 +447,7 @@ public class HomeController {
         searchField.setDisable(toggled);
         openFiltersBtn.setDisable(toggled);
         clearFiltersBtn.setDisable(toggled);
-        
+
         // Shows favorites if toggled, otherwise restaurants normally
         if (toggled) {
             User user = SessionService.getUserFromSession();
@@ -465,7 +469,7 @@ public class HomeController {
         searchField.setDisable(toggled);
         openFiltersBtn.setDisable(toggled);
         clearFiltersBtn.setDisable(toggled);
-        
+
         // Shows reviewed if toggled, otherwise restaurants normally
         if (toggled) {
             listPlaceholder.setText("Nessun ristorante recensito.");
@@ -476,17 +480,17 @@ public class HomeController {
 
             // Get only restaurants reviewed by user in session + display them
             List<Restaurant> reviewedRestaurants = ReviewsRepository.loadReviews().values().stream()
-                .filter(review -> review.getUser() != null && review.getUser().getUsername().equals(user.getUsername()))
-                .map(review -> {
-                    String restaurantId = review.getRestaurant().getId();
-                    return restaurants.stream()
-                        .filter(r -> r.getId().equals(restaurantId))
-                        .findFirst()
-                        .orElse(null);
-                })
-                .filter(Objects::nonNull)
-                .distinct()
-                .collect(Collectors.toList());
+                    .filter(review -> review.getUser() != null && review.getUser().getUsername().equals(user.getUsername()))
+                    .map(review -> {
+                        String restaurantId = review.getRestaurant().getId();
+                        return restaurants.stream()
+                                .filter(r -> r.getId().equals(restaurantId))
+                                .findFirst()
+                                .orElse(null);
+                    })
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
             setupRestaurantListView(reviewedRestaurants);
         } else {
             listPlaceholder.setText("Nessun ristorante trovato per la location selezionata.");
@@ -577,6 +581,79 @@ public class HomeController {
         dialog.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 try {
+                    // --- VALIDAZIONI ---
+
+                    if (nameField.getText().isBlank()) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Name is mandatory.");
+                        errorAlert.showAndWait();
+                        return;
+                    }
+
+                    // 1) Location: nessun numero consentito
+                    if (locationField.getText().matches(".*\\d.*")) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Location cannot contain numbers.");
+                        errorAlert.showAndWait();
+                        return;
+                    }
+
+                    // 2) Latitudine: numero float tra -90 e 90
+                    Float lat = null;
+                    if (latitudeField.getText().isBlank()) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Latitude is mandatory.");
+                        errorAlert.showAndWait();
+                        return;
+                    } else {
+                        lat = Float.parseFloat(latitudeField.getText().trim());
+                        if (lat < -90f || lat > 90f) {
+                            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Latitude must be between -90 and 90.");
+                            errorAlert.showAndWait();
+                            return;
+                        }
+                    }
+
+                    // 3) Longitudine: numero float tra -180 e 180
+                    Float lon = null;
+                    if (longitudeField.getText().isBlank()) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Longitude is mandatory.");
+                        errorAlert.showAndWait();
+                        return;
+                    } else {
+                        lon = Float.parseFloat(longitudeField.getText().trim());
+                        if (lon < -180f || lon > 180f) {
+                            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Longitude must be between -180 and 180.");
+                            errorAlert.showAndWait();
+                            return;
+                        }
+                    }
+
+                    // 4) Numero di telefono internazionale (esempio regex)
+                    String phoneRegex = "^\\+?[0-9. ()-]{7,25}$";
+                    if (!phoneField.getText().isBlank() && !phoneField.getText().matches(phoneRegex)) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Invalid international phone number format.");
+                        errorAlert.showAndWait();
+                        return;
+                    }
+
+                    // 5) URL sito web semplice (esempio regex per http(s)://...)
+                    String urlRegex = "^(https?://)?([\\w.-]+)\\.([a-z]{2,6})([/\\w .-]*)*/?$";
+                    if (!websiteField.getText().isBlank() && !websiteField.getText().matches(urlRegex)) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Invalid website URL format.");
+                        errorAlert.showAndWait();
+                        return;
+                    }
+
+                    // 6) Green Star: solo 0 o 1
+                    Integer greenStar = null;
+                    if (!greenStarField.getText().isBlank()) {
+                        greenStar = Integer.parseInt(greenStarField.getText().trim());
+                        if (greenStar != 0 && greenStar != 1) {
+                            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Green Star must be 0 or 1.");
+                            errorAlert.showAndWait();
+                            return;
+                        }
+                    }
+
+
                     // Create new restaurant object and set fields
                     Restaurant newRestaurant = new Restaurant();
 
@@ -603,12 +680,7 @@ public class HomeController {
                     newRestaurant.setDescription(descriptionArea.getText());
 
                     // Generate a unique id based on name, latitude, longitude (same logic as in repository)
-                    String id = String.valueOf(Objects.hash(
-                        newRestaurant.getName(),
-                        newRestaurant.getLatitude(),
-                        newRestaurant.getLongitude()
-                    ));
-                    newRestaurant.setId(id);
+                    newRestaurant.setId(RestaurantRepository.generateUniqueId(newRestaurant));
 
                     // Add new restaurant to repository
                     RestaurantRepository.ERROR_CODE result = RestaurantRepository.addRestaurant(newRestaurant);
@@ -616,18 +688,6 @@ public class HomeController {
                     if (result == RestaurantRepository.ERROR_CODE.NONE) {
                         // Associa il nuovo ristorante all'utente corrente
                         addNewRestaurantToCurrentUser(newRestaurant);
-
-                        // Load updated map
-                        Map<String, Restaurant> updatedRestaurantsMap = RestaurantRepository.loadRestaurants();
-
-                        // Convert map to list
-                        List<Restaurant> updatedRestaurantsList = new ArrayList<>(updatedRestaurantsMap.values());
-
-                        // Update SessionService with the list
-                        SessionService.setRestaurants(updatedRestaurantsList);
-
-                        // Update the selected restaurant in session if needed
-                        SessionService.setRestaurantInSession(newRestaurant);
 
                         // Refresh the UI list view
                         displayRestaurants();
@@ -649,6 +709,6 @@ public class HomeController {
         });
     }
 
-    
+
     //#endregion
 }

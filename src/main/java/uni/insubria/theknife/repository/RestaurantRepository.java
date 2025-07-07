@@ -1,3 +1,9 @@
+/* 
+Mordente Marcello 761730 VA
+Luciano Alessio 759956 VA
+Nardo Luca 761132 VA
+Morosini Luca 760029 VA
+*/
 package uni.insubria.theknife.repository;
 
 import java.io.*;
@@ -120,7 +126,7 @@ public class RestaurantRepository {
     }
 
 
-    
+
     //#region Restaurant CRUD
 
     //TODO TASK #11 --> non funziona + non bindata a niente
@@ -134,14 +140,15 @@ public class RestaurantRepository {
      * - NONE if the restaurant is successfully added
      */
     public static ERROR_CODE addRestaurant(Restaurant restaurant) {
-        Map<String, Restaurant> restaurants = loadRestaurants();
-        String id = String.valueOf(Objects.hash(restaurant.getName(), restaurant.getLatitude(), restaurant.getLongitude()));
+        Map<String, Restaurant> restaurants = SessionService.getRestaurants().stream().collect(Collectors.toMap(Restaurant::getId,r -> r));
+        String id = generateUniqueId(restaurant);
         if (restaurants.containsKey(id)) {
             return ERROR_CODE.DUPLICATED;
         }
-        restaurants.put(id, restaurant.setId(id)); //! ERROR? --> map contains restaurant name, not id like reviews
+        restaurants.put(id, restaurant.setId(id));
         try {
             saveRestaurants(restaurants);
+            SessionService.getRestaurants().add(restaurant);
         } catch (IOException e) {
             return ERROR_CODE.SERVICE_ERROR;
         }
@@ -155,11 +162,12 @@ public class RestaurantRepository {
      * @return ERROR_CODE.NONE if the restaurant was successfully edited, ERROR_CODE.SERVICE_ERROR if an error occurred.
      */
     public static ERROR_CODE editRestaurant(Restaurant restaurant) {
-        Map<String, Restaurant> restaurants = loadRestaurants();
+        Map<String, Restaurant> restaurants = SessionService.getRestaurants().stream().collect(Collectors.toMap(Restaurant::getId,r -> r));
         if (restaurants.containsKey(restaurant.getId())) {
             restaurants.put(restaurant.getId(), restaurant);
             try {
                 saveRestaurants(restaurants);
+                SessionService.getRestaurants().add(restaurant);
             } catch (IOException e) {
                 return ERROR_CODE.SERVICE_ERROR;
             }
@@ -178,10 +186,11 @@ public class RestaurantRepository {
      * - NONE if the operation was successful
      */
     public static ERROR_CODE deleteRestaurant(Restaurant restaurant) {
-        Map<String, Restaurant> restaurants = loadRestaurants();
+        Map<String, Restaurant> restaurants = SessionService.getRestaurants().stream().collect(Collectors.toMap(Restaurant::getId,r -> r));
         if (restaurants.remove(restaurant.getId()) != null) {
             try {
                 saveRestaurants(restaurants);
+                SessionService.getRestaurants().remove(restaurant);
             } catch (IOException e) {
                 return ERROR_CODE.SERVICE_ERROR;
             }
@@ -235,5 +244,9 @@ public class RestaurantRepository {
          * Indicates that the operation completed successfully with no errors.
          */
         NONE
+    }
+
+    public static String generateUniqueId(Restaurant restaurant){
+        return String.valueOf(Objects.hash(restaurant.getName(), restaurant.getLatitude(), restaurant.getLongitude()));
     }
 }
