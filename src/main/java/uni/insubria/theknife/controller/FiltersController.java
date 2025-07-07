@@ -252,11 +252,11 @@ public class FiltersController {
     @FXML
     private void handleResetFilters() {
         cuisineField.clear();
+        locationField.clear();
         priceCombo.setValue("Qualsiasi");
         starsCombo.setValue("Qualsiasi");
         deliveryCheck.setSelected(false);
         onlineBookingCheck.setSelected(false);
-        // locationField NON si resetta (obbligatoria)
     }
 
 }
