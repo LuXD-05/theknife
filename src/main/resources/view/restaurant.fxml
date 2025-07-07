@@ -107,8 +107,8 @@
             </VBox>
             <HBox fx:id="restaurantActionBox" alignment="CENTER" spacing="10">
                 <Button fx:id="toggleFavorite" text="☆" onAction="#handleToggleFavoriteRestaurant" style="-fx-font-size: 16px;"/>
-                <Button fx:id="editRestaurant" text="Edit" onAction="#handleEditRestaurant"/>
-                <Button fx:id="deleteRestaurant" text="Delete" onAction="#handleDeleteRestaurant"/>
+                <Button fx:id="editRestaurant" text="Edit" onAction="#handleEditRestaurant" style="-fx-font-size: 16px;"/>
+                <Button fx:id="deleteRestaurant" text="Delete" onAction="#handleDeleteRestaurant" style="-fx-font-size: 16px;"/>
                 <padding>
                     <Insets top="10"/>
                 </padding>

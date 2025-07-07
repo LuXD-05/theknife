@@ -183,7 +183,6 @@ public class FiltersController {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/home.fxml"));
             SessionService.setSceneInSession(fxmlLoader);
-            SessionService.setRestaurantInSession(null);
         } catch (IOException e) {
             e.printStackTrace();
         }

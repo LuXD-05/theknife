@@ -11,6 +11,7 @@ import uni.insubria.theknife.model.FilterOptions;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -203,4 +204,24 @@ public class SessionService {
 
     //#endregion
 
+
+    //#region CachedRestaurants
+    private static List<Restaurant> cachedRestaurants = null;
+
+    public static List<Restaurant> getRestaurants() {
+        // Se non hai una cache, caricala dal file
+        if (cachedRestaurants == null) {
+            cachedRestaurants = new ArrayList<>(RestaurantRepository.loadRestaurants().values());
+        }
+        return cachedRestaurants;
+    }
+
+    public static void setRestaurants(List<Restaurant> restaurants) {
+        cachedRestaurants = restaurants;
+    }
+
+    public static void clearRestaurants() {
+        cachedRestaurants = null;
+    }
+    //#endregion
 }
