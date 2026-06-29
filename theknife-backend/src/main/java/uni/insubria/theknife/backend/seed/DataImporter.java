@@ -54,7 +54,7 @@ public class DataImporter {
     @ConfigProperty(name = "theknife.seed.enabled", defaultValue = "true")
     boolean seedEnabled;
 
-    @ConfigProperty(name = "theknife.data.dir", defaultValue = "../data")
+    @ConfigProperty(name = "theknife.data.dir", defaultValue = "data")
     String dataDir;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -91,7 +91,10 @@ public class DataImporter {
     }
 
     private Path resolveDataDir() {
-        for (String candidate : List.of(dataDir, "data", "../data", "../../data")) {
+        // Candidati per coprire le diverse working directory:
+        // - quarkus:dev    -> cwd = theknife-backend  -> "data"
+        // - jar dalla root  -> cwd = repo root         -> "theknife-backend/data"
+        for (String candidate : List.of(dataDir, "data", "theknife-backend/data", "../data", "../../data")) {
             Path p = Path.of(candidate);
             if (Files.exists(p.resolve("michelin_my_maps.csv"))) {
                 return p;

@@ -45,12 +45,27 @@ public final class BackendClient {
 
     private volatile WebSocket webSocket;
     private volatile Consumer<Envelope> eventListener;
+    private volatile String url;
 
     private BackendClient() {
     }
 
     public static BackendClient get() {
         return INSTANCE;
+    }
+
+    /**
+     * Sets the backend WebSocket URL to use on the next {@link #connect()}.
+     * When unset, {@code connect()} falls back to the {@code theknife.backend.url}
+     * system property and then to {@link #DEFAULT_URL}.
+     */
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    /** The URL that will be (or was) used to connect. */
+    public String getUrl() {
+        return url != null ? url : System.getProperty("theknife.backend.url", DEFAULT_URL);
     }
 
     /** Listener invoked (off the FX thread) when the server pushes a broadcast EVENT. */
@@ -60,14 +75,16 @@ public final class BackendClient {
 
     /** Opens the connection, blocking until the handshake completes. */
     public void connect() {
-        String url = System.getProperty("theknife.backend.url", DEFAULT_URL);
+        String target = getUrl();
         try {
             webSocket = HttpClient.newHttpClient()
                     .newWebSocketBuilder()
-                    .buildAsync(URI.create(url), new ClientListener())
+                    // Skip ngrok's browser-warning interstitial on the WS handshake.
+                    .header("ngrok-skip-browser-warning", "true")
+                    .buildAsync(URI.create(target), new ClientListener())
                     .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (Exception e) {
-            throw new BackendException("Impossibile connettersi al backend (" + url + ")", e);
+            throw new BackendException("Impossibile connettersi al backend (" + target + ")", e);
         }
     }
 

@@ -1,0 +1,44 @@
+# Infrastruttura del backend TheKnife: PostgreSQL + (opzionale) ngrok.
+# Eseguire dalla cartella theknife-backend/, oppure dalla root con:
+#   docker compose -f theknife-backend/docker-compose.yml up -d postgres
+#
+# 'name' fissa il project name (e quindi i nomi di volume/rete) a 'theknife',
+# indipendentemente dalla cartella da cui si lancia: così il volume dati resta lo stesso.
+name: theknife
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: theknife-postgres
+    environment:
+      POSTGRES_DB: theknife
+      POSTGRES_USER: theknife
+      POSTGRES_PASSWORD: theknife
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U theknife -d theknife"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Pubblica il backend (in esecuzione sull'HOST sulla porta 8080) su una URL pubblica,
+  # per permettere ai client di collegarsi durante la demo d'esame.
+  # Avvio:  NGROK_AUTHTOKEN=xxxxx docker compose up -d ngrok
+  # La URL pubblica si legge dal web inspector http://localhost:4040
+  #   oppure:  curl -s localhost:4040/api/tunnels
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: theknife-ngrok
+    command: ["http", "host.docker.internal:8080"]
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    ports:
+      - "4040:4040"          # web inspector / API locale di ngrok
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # raggiunge il backend sull'host (necessario su Linux)
+
+volumes:
+  pgdata:
