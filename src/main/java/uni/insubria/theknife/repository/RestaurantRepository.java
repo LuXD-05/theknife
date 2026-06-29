@@ -43,10 +43,7 @@ public class RestaurantRepository {
     public RestaurantRepository() {
         // Default constructor - not meant to be used
     }
-    //TODO GITHUB TASK #9
-    //Aggiungere/Modificare/Eliminare ristoranti preferiti
-    //TODO GITHUB TASK #11
-    //Search Restaurants
+
 
     /**
      * Path to the CSV file containing the initial restaurant data.
@@ -129,7 +126,6 @@ public class RestaurantRepository {
 
     //#region Restaurant CRUD
 
-    //TODO TASK #11 --> non funziona + non bindata a niente
     /**
      * Adds a new restaurant to the repository if it does not already exist.
      *
@@ -156,24 +152,33 @@ public class RestaurantRepository {
     }
 
     /**
-     * Edits the provided Restaurant object within the list of restaurants.
+     * Edits the provided Restaurant object in the JSON repository.
      *
      * @param restaurant The Restaurant object to edit.
-     * @return ERROR_CODE.NONE if the restaurant was successfully edited, ERROR_CODE.SERVICE_ERROR if an error occurred.
+     * @return ERROR_CODE.NONE if the restaurant was successfully edited,
+     * ERROR_CODE.SERVICE_ERROR if the restaurant does not exist or an error occurred.
      */
     public static ERROR_CODE editRestaurant(Restaurant restaurant) {
-        Map<String, Restaurant> restaurants = SessionService.getRestaurants().stream().collect(Collectors.toMap(Restaurant::getId,r -> r));
-        if (restaurants.containsKey(restaurant.getId())) {
-            restaurants.put(restaurant.getId(), restaurant);
-            try {
-                saveRestaurants(restaurants);
-                SessionService.getRestaurants().add(restaurant);
-            } catch (IOException e) {
-                return ERROR_CODE.SERVICE_ERROR;
-            }
-            return ERROR_CODE.NONE;
+        Map<String, Restaurant> restaurants = loadRestaurants();
+
+        if (!restaurants.containsKey(restaurant.getId())) {
+            return ERROR_CODE.SERVICE_ERROR;
         }
-        return ERROR_CODE.SERVICE_ERROR;
+
+        restaurants.put(restaurant.getId(), restaurant);
+
+        try {
+            saveRestaurants(restaurants);
+
+            // Rebuild the session restaurant list from the saved JSON.
+            // This avoids keeping duplicated or stale Restaurant objects in memory.
+            SessionService.clearRestaurants();
+            SessionService.getRestaurants().addAll(loadRestaurants().values());
+
+            return ERROR_CODE.NONE;
+        } catch (IOException e) {
+            return ERROR_CODE.SERVICE_ERROR;
+        }
     }
 
     /**

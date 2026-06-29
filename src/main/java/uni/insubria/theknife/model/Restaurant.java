@@ -7,6 +7,7 @@ Morosini Luca 760029 VA
 package uni.insubria.theknife.model;
 
 import com.opencsv.bean.CsvBindByName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -43,12 +44,37 @@ public class Restaurant {
     public Restaurant() {
         // Default constructor - fields will be initialized with default values
     }
+
     /**
      * The unique identifier for this restaurant.
      * This field is used for equality checks.
      */
     @EqualsAndHashCode.Include
     String id;
+
+    /** 
+     *
+     * Determines whether two Restaurant objects represent the same restaurant.
+     * Equality is based on the unique restaurant identifier (id), allowing
+     * collections such as HashSet to correctly identify duplicate restaurants.
+    */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Restaurant)) return false;
+        Restaurant r = (Restaurant) o;
+        return Objects.equals(id, r.id);
+    }
+
+    /**
+     * Returns a hash code consistent with the equals method.
+     * The hash code is generated from the restaurant identifier to ensure
+     * correct behavior when Restaurant objects are stored in hash-based collections.
+    */
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
     /**
      * The name of the restaurant.
@@ -134,19 +160,23 @@ public class Restaurant {
     @CsvBindByName(column = "Description")
     String description;
 
+    // TODO ---> Verificare che il JsonIgnore qua non dia problemi al resto (utilizzato su queste 3 var per fixare duplicazione in fase di editRestaurant)
     /**
      * The calculated distance from a reference point to this restaurant in kilometers.
      */
+    @JsonIgnore
     Double distance;
 
     /**
      * The list of reviews associated with this restaurant.
      */
+    @JsonIgnore
     List<Review> reviews = new ArrayList<>();
 
     /**
      * The user who owns or manages this restaurant, if applicable.
      */
+    @JsonIgnore
     User user = null;
 
     /**

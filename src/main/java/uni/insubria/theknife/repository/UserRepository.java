@@ -133,7 +133,6 @@ public class UserRepository {
         return ERROR_CODE.NONE;
     }
 
-    //TODO GITHUB TASK #9:    
     //#region Favorites CRUD
 
     /**
@@ -167,8 +166,6 @@ public class UserRepository {
         return ERROR_CODE.NONE;
 
     }
-
-
 
     //#endregion
 

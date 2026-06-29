@@ -12,7 +12,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+
 import org.controlsfx.control.textfield.TextFields;
 import uni.insubria.theknife.Main;
 import uni.insubria.theknife.model.Role;
@@ -75,15 +78,37 @@ public class RegisterController {
     private DatePicker birthdateTextField;
 
     /**
+     * Radio button to select the user as a client.
+     */
+    @FXML
+    private RadioButton clienteRadioButton;
+
+    /**
+     * Radio button to select the user as a restaurateur.
+     */
+    @FXML
+    private RadioButton ristoratoreRadioButton;
+
+    /**
+     * ToggleGroup that enforces a single selection between CLIENTE and RISTORATORE roles.
+     */
+    private final ToggleGroup roleToggleGroup = new ToggleGroup();
+
+    /**
      * Initializes the controller.
      * <p>
      * This method is automatically called after the FXML file has been loaded.
-     * It sets up auto-completion for the city text field using available locations.
+     * It sets up auto-completion for the city text field using available locations
+     * and initializes the ToggleGroup for user role selection (CLIENTE / RISTORATORE),
+     * ensuring that only one role can be selected at a time.
      * </p>
      */
     @FXML
     private void initialize() {
         TextFields.bindAutoCompletion(cityTextField, SessionService.getLocations());
+
+        clienteRadioButton.setToggleGroup(roleToggleGroup);
+        ristoratoreRadioButton.setToggleGroup(roleToggleGroup);
     }
 
     /**
@@ -100,18 +125,22 @@ public class RegisterController {
     protected void onConfirmButtonClick() throws IOException {
         if (usernameTextField.textProperty().get().isEmpty() || firstNameTextField.textProperty().get().isEmpty() ||
                 lastNameTextField.textProperty().get().isEmpty() || passwordTextField.textProperty().get().isEmpty() ||
-                cityTextField.textProperty().get().isEmpty() || birthdateTextField.getValue() == null
+                cityTextField.textProperty().get().isEmpty() || birthdateTextField.getValue() == null || 
+                roleToggleGroup.getSelectedToggle() == null
         ) {
             AlertService.alert(AlertType.WARNING, "ATTENZIONE", "Compilare tutti i campi", null);
             return;
         }
+
         User user = new User().setUsername(usernameTextField.getText())
                 .setFirstName(firstNameTextField.getText())
                 .setLastName(lastNameTextField.getText())
                 .setPassword(SecurityService.encode(passwordTextField.getText()))
                 .setBirthDate(birthdateTextField.getValue())
                 .setCity(cityTextField.getText())
-                .setRole(Role.CLIENTE);
+                .setRole(roleToggleGroup.getSelectedToggle() == clienteRadioButton
+                    ? Role.CLIENTE
+                    : Role.RISTORATORE);
 
         UserRepository.ERROR_CODE errorCode = UserRepository.addUser(user);
         switch (errorCode) {

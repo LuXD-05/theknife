@@ -972,14 +972,20 @@ public class RestaurantController {
             return;
 
         // Toggle favorite in user object + alert on error
-        UserRepository.ERROR_CODE result =  UserRepository.toggleFavoriteRestaurant(user, restaurant);
+        UserRepository.ERROR_CODE result =
+                UserRepository.toggleFavoriteRestaurant(user, restaurant);
+
         if (result != UserRepository.ERROR_CODE.NONE) {
-            AlertService.alert(Alert.AlertType.ERROR, "ATTENZIONE", null, "Errore durante l'aggiunta/rimozione del preferito.");
+            AlertService.alert(Alert.AlertType.ERROR, "ATTENZIONE", null,
+                    "Errore durante l'aggiunta/rimozione del preferito.");
             return;
         }
 
-        // If user now contains restaurant as favorite --> set text accordingly
-        if (user.getRestaurants().contains(restaurant))
+        User updatedUser = UserRepository.getUser(user.getUsername());
+        SessionService.setUserInSession(updatedUser);
+
+        // Update the favorite button to reflect the current favorite status.
+        if (updatedUser.getRestaurants().contains(restaurant))
             toggleFavorite.setText("★");
         else
             toggleFavorite.setText("☆");
@@ -1162,10 +1168,15 @@ public class RestaurantController {
                     restaurant.setGreenStar(greenStar);
                     restaurant.setDescription(descriptionArea.getText());
 
-                    // Salva modifiche repository
-                    RestaurantRepository.editRestaurant(restaurant);
+                    RestaurantRepository.ERROR_CODE result = RestaurantRepository.editRestaurant(restaurant);
 
-                    // Aggiorna sessione e UI
+                    if (result != RestaurantRepository.ERROR_CODE.NONE) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Could not update restaurant.");
+                        errorAlert.showAndWait();
+                        return;
+                    }
+
+                    // Update session and UI only after a successful save.
                     SessionService.setRestaurantInSession(restaurant);
                     reloadRestaurantView();
 
