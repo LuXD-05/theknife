@@ -17,7 +17,6 @@ import org.controlsfx.control.textfield.TextFields;
 
 import uni.insubria.theknife.Main;
 import uni.insubria.theknife.service.AlertService;
-import uni.insubria.theknife.service.SecurityService;
 import uni.insubria.theknife.service.SessionService;
 import uni.insubria.theknife.model.User;
 import uni.insubria.theknife.repository.UserRepository;
@@ -99,21 +98,18 @@ public class LoginController {
         String username = usernameTextField.getText();
         String password = passwordTextField.getText();
 
-        User user = UserRepository.getUser(username);
+        // Credentials are validated server-side; the password hash never leaves the backend.
+        User user = UserRepository.login(username, password);
 
         if (user == null) {
-            AlertService.alert(AlertType.WARNING, "ATTENZIONE", null, "Utente non trovato");
+            AlertService.alert(AlertType.WARNING, "ATTENZIONE", null, "Username o password non validi");
             return;
         }
 
-        if (SecurityService.validate(password, user.getPassword())) {
-            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/home.fxml"));
-            SessionService.setUserInSession(user);
-            SessionService.setLocation(user.getCity());
-            SessionService.setSceneInSession(fxmlLoader);
-            return;
-        }
-        AlertService.alert(AlertType.WARNING, "ATTENZIONE", null, "Password errata");
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/home.fxml"));
+        SessionService.setUserInSession(user);
+        SessionService.setLocation(user.getCity());
+        SessionService.setSceneInSession(fxmlLoader);
     }
 
     /**

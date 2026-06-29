@@ -203,6 +203,10 @@ public class RestaurantController {
         initializeRatingSelector();
         populateRestaurantDetails();
 
+        // Refresh reviews in real time when the backend broadcasts review changes for
+        // the restaurant currently being viewed.
+        SessionService.setOnDataChanged(() ->
+                SessionService.getRestaurantFromSession().ifPresent(r -> setupReviewListView(r.getReviews())));
     }
 
     /**

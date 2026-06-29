@@ -133,6 +133,13 @@ public class HomeController {
         initializeUserState();
         displayRestaurants();
 
+        // Refresh the list in real time when the backend broadcasts catalog changes
+        // (unless a favorites/reviewed toggle is currently active).
+        SessionService.setOnDataChanged(() -> {
+            if (!toggled) {
+                displayRestaurants();
+            }
+        });
     }
 
     /**

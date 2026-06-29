@@ -18,7 +18,6 @@ import uni.insubria.theknife.Main;
 import uni.insubria.theknife.model.Role;
 import uni.insubria.theknife.repository.UserRepository;
 import uni.insubria.theknife.service.AlertService;
-import uni.insubria.theknife.service.SecurityService;
 import uni.insubria.theknife.service.SessionService;
 import uni.insubria.theknife.model.User;
 
@@ -108,7 +107,7 @@ public class RegisterController {
         User user = new User().setUsername(usernameTextField.getText())
                 .setFirstName(firstNameTextField.getText())
                 .setLastName(lastNameTextField.getText())
-                .setPassword(SecurityService.encode(passwordTextField.getText()))
+                .setPassword(passwordTextField.getText())
                 .setBirthDate(birthdateTextField.getValue())
                 .setCity(cityTextField.getText())
                 .setRole(Role.CLIENTE);

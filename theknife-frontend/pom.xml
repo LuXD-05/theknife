@@ -13,6 +13,12 @@
     <artifactId>theknife-frontend</artifactId>
     <name>TheKnife (JavaFX client)</name>
 
+    <properties>
+        <!-- Default di fallback se nessun profilo OS si attiva; i profili sotto
+             lo sovrascrivono in base a sistema operativo e architettura. -->
+        <javafx.platform>mac-aarch64</javafx.platform>
+    </properties>
+
     <dependencies>
         <!-- Common DTOs and WebSocket protocol -->
         <dependency>
@@ -38,16 +44,32 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
-        <!-- JavaFX -->
+        <!-- JavaFX — il classifier ${javafx.platform} è impostato dai profili per OS/arch
+             più sotto, così il jar (incluso il fat-jar) contiene classi e librerie native
+             della piattaforma su cui si compila (macOS x64/arm64, Windows, Linux x64/arm64). -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
+        </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
+            <classifier>${javafx.platform}</classifier>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>
@@ -89,6 +111,30 @@
                     <version>${maven-javafx-plugin.version}</version>
                     <configuration>
                         <mainClass>uni.insubria.theknife.Launcher</mainClass>
+                        <!-- ControlsFX usa API interne di JavaFX: senza questi add-exports
+                             fallisce con IllegalAccessError (es. com.sun.javafx.event). -->
+                        <options>
+                            <option>--add-exports</option>
+                            <option>javafx.base/com.sun.javafx.event=ALL-UNNAMED</option>
+                            <option>--add-exports</option>
+                            <option>javafx.base/com.sun.javafx.collections=ALL-UNNAMED</option>
+                            <option>--add-exports</option>
+                            <option>javafx.base/com.sun.javafx.runtime=ALL-UNNAMED</option>
+                            <option>--add-exports</option>
+                            <option>javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED</option>
+                            <option>--add-exports</option>
+                            <option>javafx.graphics/com.sun.javafx.css=ALL-UNNAMED</option>
+                            <option>--add-exports</option>
+                            <option>javafx.graphics/com.sun.javafx.util=ALL-UNNAMED</option>
+                            <option>--add-exports</option>
+                            <option>javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED</option>
+                            <option>--add-exports</option>
+                            <option>javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED</option>
+                            <option>--add-exports</option>
+                            <option>javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED</option>
+                            <option>--add-exports</option>
+                            <option>javafx.controls/com.sun.javafx.scene.control.inputmap=ALL-UNNAMED</option>
+                        </options>
                     </configuration>
                 </plugin>
             </plugins>
@@ -123,4 +169,45 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- Multi-arch: ogni profilo imposta il classifier nativo JavaFX corretto.
+         L'attivazione è automatica in base a OS/architettura del build host;
+         si può forzare manualmente con -Djavafx.platform=<classifier>. -->
+    <profiles>
+        <profile>
+            <id>javafx-mac-aarch64</id>
+            <activation>
+                <os><family>mac</family><arch>aarch64</arch></os>
+            </activation>
+            <properties><javafx.platform>mac-aarch64</javafx.platform></properties>
+        </profile>
+        <profile>
+            <id>javafx-mac-x86_64</id>
+            <activation>
+                <os><family>mac</family><arch>x86_64</arch></os>
+            </activation>
+            <properties><javafx.platform>mac</javafx.platform></properties>
+        </profile>
+        <profile>
+            <id>javafx-windows</id>
+            <activation>
+                <os><family>windows</family></os>
+            </activation>
+            <properties><javafx.platform>win</javafx.platform></properties>
+        </profile>
+        <profile>
+            <id>javafx-linux-x86_64</id>
+            <activation>
+                <os><family>unix</family><name>Linux</name><arch>amd64</arch></os>
+            </activation>
+            <properties><javafx.platform>linux</javafx.platform></properties>
+        </profile>
+        <profile>
+            <id>javafx-linux-aarch64</id>
+            <activation>
+                <os><family>unix</family><name>Linux</name><arch>aarch64</arch></os>
+            </activation>
+            <properties><javafx.platform>linux-aarch64</javafx.platform></properties>
+        </profile>
+    </profiles>
 </project>
