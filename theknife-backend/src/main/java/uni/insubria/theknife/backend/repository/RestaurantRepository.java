@@ -18,6 +18,16 @@ import java.util.List;
 @ApplicationScoped
 public class RestaurantRepository implements PanacheRepositoryBase<RestaurantEntity, String> {
 
+    /** Restaurants in a given location/city (the only way the client lists restaurants). */
+    public List<RestaurantEntity> findByLocation(String location) {
+        return list("location", location);
+    }
+
+    /** Restaurants owned by a given user (RISTORATORE), regardless of city. */
+    public List<RestaurantEntity> findByOwner(String username) {
+        return list("ownerUsername", username);
+    }
+
     /** Distinct, sorted list of restaurant locations. */
     public List<String> distinctLocations() {
         return getEntityManager()

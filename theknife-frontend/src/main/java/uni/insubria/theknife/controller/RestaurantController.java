@@ -203,10 +203,6 @@ public class RestaurantController {
         initializeRatingSelector();
         populateRestaurantDetails();
 
-        // Refresh reviews in real time when the backend broadcasts review changes for
-        // the restaurant currently being viewed.
-        SessionService.setOnDataChanged(() ->
-                SessionService.getRestaurantFromSession().ifPresent(r -> setupReviewListView(r.getReviews())));
     }
 
     /**
@@ -415,7 +411,7 @@ public class RestaurantController {
             setLabelText(michelinUrlLabel, restaurant.getMichelinUrl());
             setLabelText(websiteUrlLabel, restaurant.getWebsiteUrl());
             setLabelText(awardLabel, restaurant.getAward());
-            setLabelText(greenStarLabel, restaurant.getGreenStar() != 0 ? String.valueOf(restaurant.getGreenStar()) : "");
+            setLabelText(greenStarLabel, restaurant.getGreenStar() != null && restaurant.getGreenStar() != 0 ? "1" : "");
             setLabelText(facilitiesLabel, restaurant.getFacilities());
 
             initializeReviewsList(restaurant);
@@ -809,7 +805,7 @@ public class RestaurantController {
                 }
 
                 // Show edit/delete buttons only for the review author
-                String currentUser = SessionService.getUserFromSession().getUsername();
+                String currentUser = SessionService.getUserFromSession() != null ? SessionService.getUserFromSession().getUsername() : null;
                 boolean isAuthor = review.getUser().getUsername().equals(currentUser);
                 actionBox.setVisible(isAuthor);
 
@@ -976,13 +972,20 @@ public class RestaurantController {
             return;
 
         // Toggle favorite in user object + alert on error
-        UserRepository.ERROR_CODE result =  UserRepository.toggleFavoriteRestaurant(user, restaurant);
+        UserRepository.ERROR_CODE result =
+                UserRepository.toggleFavoriteRestaurant(user, restaurant);
+
         if (result != UserRepository.ERROR_CODE.NONE) {
-            AlertService.alert(Alert.AlertType.ERROR, "ATTENZIONE", null, "Errore durante l'aggiunta/rimozione del preferito.");
+            AlertService.alert(Alert.AlertType.ERROR, "ATTENZIONE", null,
+                    "Errore durante l'aggiunta/rimozione del preferito.");
             return;
         }
 
-        // If user now contains restaurant as favorite --> set text accordingly
+        // toggleFavoriteRestaurant already updated the in-memory user's favorites
+        // (in sync with the server response), so no refetch is needed.
+        SessionService.setUserInSession(user);
+
+        // Update the favorite button to reflect the current favorite status.
         if (user.getRestaurants().contains(restaurant))
             toggleFavorite.setText("★");
         else
@@ -1166,10 +1169,15 @@ public class RestaurantController {
                     restaurant.setGreenStar(greenStar);
                     restaurant.setDescription(descriptionArea.getText());
 
-                    // Salva modifiche repository
-                    RestaurantRepository.editRestaurant(restaurant);
+                    RestaurantRepository.ERROR_CODE result = RestaurantRepository.editRestaurant(restaurant);
 
-                    // Aggiorna sessione e UI
+                    if (result != RestaurantRepository.ERROR_CODE.NONE) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Could not update restaurant.");
+                        errorAlert.showAndWait();
+                        return;
+                    }
+
+                    // Update session and UI only after a successful save.
                     SessionService.setRestaurantInSession(restaurant);
                     reloadRestaurantView();
 

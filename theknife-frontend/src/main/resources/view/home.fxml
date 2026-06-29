@@ -23,7 +23,11 @@
         
         <!-- Grouping city and restaurant search in a horizontal layout -->
         <HBox layoutX="10.0" layoutY="20.0" spacing="20.0" alignment="CENTER">
-            
+
+            <!-- City selection (mandatory): the search runs automatically when a city is
+                 picked from the autocomplete dropdown -->
+            <TextField fx:id="cityField" prefHeight="27.0" prefWidth="230.0" promptText="Seleziona una città *"/>
+
             <!-- Search bar for restaurant name -->
             <TextField fx:id="searchField" prefHeight="27.0" prefWidth="230.0" promptText="Cerca un ristorante" onKeyReleased="#handleSearch"/>
 

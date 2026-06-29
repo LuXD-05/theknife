@@ -50,6 +50,7 @@ public class Dispatcher {
                 case REGISTER -> auth.register(req, state);
                 case LOGOUT -> auth.logout(req, state);
                 case LIST_RESTAURANTS -> catalog.listRestaurants(req);
+                case LIST_MY_RESTAURANTS -> catalog.listMyRestaurants(req, state);
                 case GET_RESTAURANT -> catalog.getRestaurant(req);
                 case GET_LOCATIONS -> catalog.getLocations(req);
                 case GET_CUISINES -> catalog.getCuisines(req);

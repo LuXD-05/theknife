@@ -61,26 +61,19 @@ public class SessionService {
     private static volatile Runnable onDataChanged = null;
 
     /**
-     * One-time bootstrap: loads the catalog from the backend, derives reference lists,
-     * and wires real-time updates. Must be called after {@link BackendClient#connect()}.
+     * One-time bootstrap: wires real-time updates. The reference lists (locations/cuisines)
+     * and the city-scoped catalog are fetched lazily from the backend on demand, so startup
+     * no longer downloads the whole ~17k catalog. Must be called after
+     * {@link BackendClient#connect()}.
      */
     public static void bootstrap() {
-        cachedRestaurants = new ArrayList<>(RestaurantRepository.loadRestaurants().values());
-        recomputeReferenceLists();
         BackendClient.get().setEventListener(SessionService::applyEvent);
     }
 
-    private static void recomputeReferenceLists() {
-        locations = cachedRestaurants.stream()
-                .map(Restaurant::getLocation)
-                .filter(l -> l != null && !l.isBlank())
-                .collect(Collectors.toCollection(java.util.TreeSet::new))
-                .stream().toList();
-        cuisines = cachedRestaurants.stream()
-                .map(Restaurant::getCuisine)
-                .filter(c -> c != null && !c.isBlank())
-                .collect(Collectors.toCollection(java.util.TreeSet::new))
-                .stream().toList();
+    /** Forces locations/cuisines to be re-fetched from the backend on next access. */
+    private static void invalidateReferenceLists() {
+        locations = null;
+        cuisines = null;
     }
 
     public static void setStageInSession(Stage stage, FXMLLoader fxmlLoader) throws IOException {
@@ -146,28 +139,43 @@ public class SessionService {
 
     public static List<String> getLocations() {
         if (locations == null) {
-            getRestaurants();
-            recomputeReferenceLists();
+            locations = RestaurantRepository.loadLocations();
         }
         return locations;
     }
 
     public static List<String> getCuisines() {
         if (cuisines == null) {
-            getRestaurants();
-            recomputeReferenceLists();
+            cuisines = RestaurantRepository.loadCuisines();
         }
         return cuisines;
     }
 
     //#endregion
 
-    //#region Cached restaurants
+    //#region Cached restaurants (scoped to the current city)
 
+    /** The city currently in scope: the active location filter, else the session location. */
+    private static String cachedLocation = null;
+
+    private static String currentCity() {
+        FilterOptions f = getFilters();
+        if (f != null && f.getLocation() != null && !f.getLocation().isBlank()) {
+            return f.getLocation();
+        }
+        return getLocation();
+    }
+
+    /**
+     * Returns the cached restaurants for the current city, fetching them from the backend
+     * when the cache is empty or the city changed (e.g. after applying a different location
+     * filter). The client only ever holds one city's worth of restaurants.
+     */
     public static List<Restaurant> getRestaurants() {
-        if (cachedRestaurants == null) {
-            cachedRestaurants = new ArrayList<>(RestaurantRepository.loadRestaurants().values());
-            recomputeReferenceLists();
+        String city = currentCity();
+        if (cachedRestaurants == null || !java.util.Objects.equals(city, cachedLocation)) {
+            cachedRestaurants = new ArrayList<>(RestaurantRepository.loadRestaurantsByLocation(city).values());
+            cachedLocation = city;
         }
         return cachedRestaurants;
     }
@@ -178,6 +186,7 @@ public class SessionService {
 
     public static void clearRestaurants() {
         cachedRestaurants = null;
+        cachedLocation = null;
     }
 
     //#endregion
@@ -215,25 +224,27 @@ public class SessionService {
         switch (event.action()) {
             case RESTAURANT_ADDED -> {
                 RestaurantDto dto = convert(payload, RestaurantDto.class);
-                if (dto != null && findRestaurant(dto.id()) == null) {
+                // Only add it to the cache if it belongs to the city currently in scope.
+                if (dto != null && java.util.Objects.equals(dto.location(), cachedLocation)
+                        && findRestaurant(dto.id()) == null) {
                     cachedRestaurants.add(DtoMapper.toModel(dto));
-                    recomputeReferenceLists();
                 }
+                invalidateReferenceLists();
             }
             case RESTAURANT_EDITED -> {
                 RestaurantDto dto = convert(payload, RestaurantDto.class);
                 Restaurant existing = dto == null ? null : findRestaurant(dto.id());
                 if (existing != null) {
                     applyEditableFields(existing, dto);
-                    recomputeReferenceLists();
                 }
+                invalidateReferenceLists();
             }
             case RESTAURANT_DELETED -> {
                 String id = payload == null ? null : payload.path("id").asText(null);
                 if (id != null) {
                     cachedRestaurants.removeIf(r -> id.equals(r.getId()));
-                    recomputeReferenceLists();
                 }
+                invalidateReferenceLists();
             }
             case REVIEW_ADDED -> {
                 ReviewDto dto = convert(payload, ReviewDto.class);

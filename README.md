@@ -17,6 +17,7 @@ JavaFX client  ──WebSocket (JSON)──►  Quarkus backend  ──JDBC─�
 - Un unico endpoint WebSocket (`/ws`). Ogni messaggio è una "envelope" JSON (`REQUEST`/`RESPONSE`/`EVENT`) con un `correlationId` per correlare richiesta e risposta.
 - Le operazioni mutanti girano in transazione; al commit il backend fa il **broadcast** dell'evento agli altri client.
 - Le password sono validate e hashate **solo lato server** (BCrypt): l'hash non lascia mai il backend.
+- Il client scarica i ristoranti **solo filtrati per città** (la città dell'utente loggato, o la location scelta dal guest): `LIST_RESTAURANTS` richiede una `location` e restituisce solo quella città (poche centinaia di KB), invece dell'intero catalogo (~18 MB). Questo rende la demo via ngrok rapida e affidabile. Le liste di location/cucine per gli autocomplete arrivano da `GET_LOCATIONS`/`GET_CUISINES`.
 
 ### Requisiti di sistema
 

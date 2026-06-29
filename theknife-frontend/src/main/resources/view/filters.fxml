@@ -33,10 +33,10 @@
             <TextField fx:id="cuisineField" promptText="Tutte le tipologie" />
         </HBox>
 
-        <!-- Location -->
+        <!-- Location (obbligatoria) -->
         <HBox spacing="10" alignment="CENTER_LEFT">
-            <Label text="Location" />
-            <TextField fx:id="locationField" promptText="Tutte le location" />
+            <Label text="Città *" />
+            <TextField fx:id="locationField" promptText="Città (obbligatoria)" />
         </HBox>
 
         <!-- Price -->

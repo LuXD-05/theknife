@@ -109,8 +109,10 @@ public class FiltersController {
         // Cuisine
         cuisineField.setText(filters.getCuisine() == null ? "" : filters.getCuisine());
 
-        // Location
-        locationField.setText(filters.getLocation() == null ? "" : filters.getLocation());
+        // Location (obbligatoria): se il filtro non ha ancora una città, pre-compila con
+        // quella corrente della sessione (es. la città dell'utente loggato).
+        String currentCity = filters.getLocation() != null ? filters.getLocation() : SessionService.getLocation();
+        locationField.setText(currentCity == null ? "" : currentCity);
 
         // Average price $
         priceCombo.setItems(FXCollections.observableArrayList("Qualsiasi", "$", "$$", "$$$", "$$$$"));
@@ -223,16 +225,29 @@ public class FiltersController {
     @FXML
     private void handleApplyFilters() throws IOException {
 
-        // No --> location vuota = qualsiasi location
-        // // if (locationField.getText().isBlank()) {
-        // //     showAlert("Filtro mancante", "La location è obbligatoria.");
-        // //     return;
-        // // }
+        // La città è obbligatoria: il backend restituisce i ristoranti solo per città.
+        String selectedLocation = locationField.getText() == null ? "" : locationField.getText().trim();
+        if (selectedLocation.isBlank()) {
+            AlertService.alert(Alert.AlertType.WARNING, "ATTENZIONE", "La città è obbligatoria",
+                    "Seleziona una città per cercare i ristoranti.");
+            return;
+        }
+        // Deve corrispondere a una città esistente; normalizza alla stringa esatta nota
+        // (case-insensitive) così la query per location sul backend combacia.
+        String canonicalLocation = SessionService.getLocations().stream()
+                .filter(l -> l.equalsIgnoreCase(selectedLocation))
+                .findFirst()
+                .orElse(null);
+        if (canonicalLocation == null) {
+            AlertService.alert(Alert.AlertType.WARNING, "ATTENZIONE", "Città non valida",
+                    "Nessuna città corrispondente. Seleziona una città dall'elenco dei suggerimenti.");
+            return;
+        }
 
         FilterOptions filters = new FilterOptions();
 
         filters.setCuisine(cuisineField.getText().isBlank() ? null : cuisineField.getText().trim());
-        filters.setLocation(locationField.getText().isBlank() ? null : locationField.getText().trim());
+        filters.setLocation(canonicalLocation);
 
         String selectedPrice = priceCombo.getValue();
         if (!"Qualsiasi".equals(selectedPrice)) {

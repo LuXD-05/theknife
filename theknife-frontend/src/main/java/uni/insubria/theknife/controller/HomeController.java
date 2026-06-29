@@ -18,6 +18,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import lombok.extern.slf4j.Slf4j;
 
+import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 
 import uni.insubria.theknife.model.FilterOptions;
@@ -27,6 +28,7 @@ import uni.insubria.theknife.model.Role;
 import uni.insubria.theknife.model.User;
 import uni.insubria.theknife.repository.RestaurantRepository;
 import uni.insubria.theknife.repository.ReviewsRepository;
+import uni.insubria.theknife.service.AlertService;
 import uni.insubria.theknife.service.SessionService;
 import uni.insubria.theknife.util.DistanceCalculator;
 
@@ -91,11 +93,6 @@ public class HomeController {
     @FXML
     private ListView<Restaurant> restaurantListView;
 
-    /**
-     * Map for save all restaurants
-     */
-    private Map<String, Restaurant> allRestaurants = new HashMap<>();
-
     private boolean toggled = false;
 
     /**
@@ -127,10 +124,15 @@ public class HomeController {
      * This method is automatically called after the FXML file has been loaded.
      * It sets up the user state, toggle buttons and displays the list of restaurants.
      */
+    /** City selection field (mandatory): the restaurant search is scoped to one city. */
+    @FXML
+    private TextField cityField;
+
     @FXML
     private void initialize() {
 
         initializeUserState();
+        setupCityField();
         displayRestaurants();
 
         // Refresh the list in real time when the backend broadcasts catalog changes
@@ -140,17 +142,6 @@ public class HomeController {
                 displayRestaurants();
             }
         });
-    }
-
-    /**
-     * Initialize ListView
-     */
-    @FXML
-    public void initializeListView() {
-        // Load all restaurants only once, when the view is initialized
-        allRestaurants = RestaurantRepository.loadRestaurants();
-
-        restaurantListView.setItems(FXCollections.observableArrayList(allRestaurants.values()));
     }
 
     /**
@@ -193,6 +184,12 @@ public class HomeController {
             addRestaurantBtn.setManaged(false);
         }
 
+        // City search applies to CLIENTE/guest only; the RISTORATORE sees owned restaurants.
+        boolean ownerRole = role == Role.RISTORATORE;
+        if (cityField != null) {
+            cityField.setVisible(!ownerRole);
+            cityField.setManaged(!ownerRole);
+        }
     }
 
     /**
@@ -267,12 +264,19 @@ public class HomeController {
      * @return A filtered and sorted list of Restaurant objects
      */
     private List<Restaurant> getFilteredRestaurants() {
-        List<Restaurant> all = SessionService.getRestaurants(); // ora prende dati aggiornati
         User user = SessionService.getUserFromSession();
         FilterOptions filters = SessionService.getFilters();
 
-        return all.stream()
-                .filter(r -> user == null || !Role.RISTORATORE.equals(user.getRole()) || user.getRestaurants().contains(r))
+        // The RISTORATORE sees the restaurants they OWN, fetched by owner from the backend,
+        // regardless of the currently selected city (their restaurants may be in any city).
+        if (user != null && Role.RISTORATORE.equals(user.getRole())) {
+            return RestaurantRepository.loadMyRestaurants().values().stream()
+                    .sorted(Comparator.comparing(Restaurant::getName, String.CASE_INSENSITIVE_ORDER))
+                    .collect(Collectors.toList());
+        }
+
+        // CLIENTE / guest: the restaurants of the selected city, with client-side filters.
+        return SessionService.getRestaurants().stream()
                 .filter(r -> filters == null || filters.matches(r))
                 .sorted(Comparator.comparing(Restaurant::getName, String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList());
@@ -320,6 +324,70 @@ public class HomeController {
     // TextField used to capture the user's input for restaurant name search
     @FXML
     private TextField searchField;
+
+    /**
+     * Configures the city field: autocomplete over the known locations, prefill with the
+     * current city (the logged user's city or the location already chosen), and trigger the
+     * search on Enter. The restaurant search is always scoped to a city.
+     */
+    private void setupCityField() {
+        if (cityField == null) {
+            return;
+        }
+        AutoCompletionBinding<String> binding = TextFields.bindAutoCompletion(cityField, param -> {
+            String userText = param.getUserText().toLowerCase();
+            return SessionService.getLocations().stream()
+                    .filter(l -> l.toLowerCase().contains(userText))
+                    .collect(Collectors.toList());
+        });
+        // Run the search automatically as soon as a city is picked from the dropdown.
+        binding.setOnAutoCompleted(e -> handleCitySearch());
+
+        FilterOptions filters = SessionService.getFilters();
+        String current = (filters != null && filters.getLocation() != null && !filters.getLocation().isBlank())
+                ? filters.getLocation()
+                : SessionService.getLocation();
+        cityField.setText(current == null ? "" : current);
+        // Enter also triggers the search (e.g. when the city is typed in full).
+        cityField.setOnAction(e -> handleCitySearch());
+    }
+
+    /**
+     * Handles the city-scoped search: the city is mandatory and must be a known location.
+     * On success it sets the active location and reloads the restaurants for that city.
+     */
+    @FXML
+    private void handleCitySearch() {
+        String selected = cityField.getText() == null ? "" : cityField.getText().trim();
+        if (selected.isBlank()) {
+            AlertService.alert(Alert.AlertType.WARNING, "ATTENZIONE", "Città obbligatoria",
+                    "Seleziona una città prima di effettuare la ricerca.");
+            return;
+        }
+        String canonical = SessionService.getLocations().stream()
+                .filter(l -> l.equalsIgnoreCase(selected))
+                .findFirst()
+                .orElse(null);
+        if (canonical == null) {
+            AlertService.alert(Alert.AlertType.WARNING, "ATTENZIONE", "Città non valida",
+                    "Seleziona una città dall'elenco dei suggerimenti.");
+            return;
+        }
+        cityField.setText(canonical);
+
+        FilterOptions filters = SessionService.getFilters();
+        if (filters == null) {
+            filters = new FilterOptions();
+            SessionService.setFilters(filters);
+        }
+        filters.setLocation(canonical);
+        SessionService.setLocation(canonical);
+
+        if (searchField != null) {
+            searchField.clear();
+        }
+        displayRestaurants();
+    }
 
     /**
      * Handles the real-time search of restaurants based on user input in the search field.

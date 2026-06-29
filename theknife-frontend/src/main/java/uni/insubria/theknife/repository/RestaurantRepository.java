@@ -40,11 +40,16 @@ public class RestaurantRepository {
     }
 
     /**
-     * Loads the whole restaurant catalog (with embedded reviews) from the backend.
+     * Loads the restaurants of a single city/location (with embedded reviews) from the
+     * backend. The client can only fetch restaurants by city, so the payload stays small
+     * (a city) instead of the whole ~17k catalog. A blank location yields an empty map.
      */
-    public static Map<String, Restaurant> loadRestaurants() {
+    public static Map<String, Restaurant> loadRestaurantsByLocation(String location) {
+        if (location == null || location.isBlank()) {
+            return new LinkedHashMap<>();
+        }
         try {
-            Envelope response = BackendClient.get().sendAndWait(Action.LIST_RESTAURANTS, null);
+            Envelope response = BackendClient.get().sendAndWait(Action.LIST_RESTAURANTS, Map.of("location", location));
             if (response.error() != ErrorCode.NONE || response.payload() == null) {
                 throw new RuntimeException("Errore nel caricamento dei ristoranti");
             }
@@ -60,6 +65,54 @@ public class RestaurantRepository {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException("Errore nel caricamento dei ristoranti", e);
+        }
+    }
+
+    /**
+     * Loads the restaurants owned by the authenticated RISTORATORE (any city), with
+     * embedded reviews. Used by the home view so the owner always sees their own
+     * restaurants regardless of the currently selected city.
+     */
+    public static Map<String, Restaurant> loadMyRestaurants() {
+        try {
+            Envelope response = BackendClient.get().sendAndWait(Action.LIST_MY_RESTAURANTS, null);
+            if (response.error() != ErrorCode.NONE || response.payload() == null) {
+                return new LinkedHashMap<>();
+            }
+            List<RestaurantDto> dtos = BackendClient.get().mapper()
+                    .convertValue(response.payload(), new TypeReference<List<RestaurantDto>>() {
+                    });
+            Map<String, Restaurant> map = new LinkedHashMap<>();
+            for (Restaurant r : DtoMapper.toModelList(dtos)) {
+                map.put(r.getId(), r);
+            }
+            return map;
+        } catch (Exception e) {
+            return new LinkedHashMap<>();
+        }
+    }
+
+    /** Distinct locations from the backend (for the city autocomplete). */
+    public static List<String> loadLocations() {
+        return loadStringList(Action.GET_LOCATIONS);
+    }
+
+    /** Distinct cuisines from the backend (for the cuisine autocomplete). */
+    public static List<String> loadCuisines() {
+        return loadStringList(Action.GET_CUISINES);
+    }
+
+    private static List<String> loadStringList(Action action) {
+        try {
+            Envelope response = BackendClient.get().sendAndWait(action, null);
+            if (response.error() != ErrorCode.NONE || response.payload() == null) {
+                return List.of();
+            }
+            return BackendClient.get().mapper()
+                    .convertValue(response.payload(), new TypeReference<List<String>>() {
+                    });
+        } catch (Exception e) {
+            return List.of();
         }
     }
 
