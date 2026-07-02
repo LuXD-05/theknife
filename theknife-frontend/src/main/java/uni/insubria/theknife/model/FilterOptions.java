@@ -79,53 +79,260 @@ public class FilterOptions {
      */
     public boolean matches(Restaurant r) {
 
+        // Ristorante non presente
+        if (r == null) {
+            return false;
+        }
+
         // Location (case-insensitive)
-        if (location != null && !location.isBlank() && !r.getLocation().equalsIgnoreCase(location)) {
+        if (!isBlank(location) && !equalsIgnoreCase(r.getLocation(), location)) {
             return false;
         }
 
         // Tipologia cucina
-        if (cuisine != null && !cuisine.isBlank() && !r.getCuisine().equalsIgnoreCase(cuisine)) {
+        if (!isBlank(cuisine)) {
             return false;
         }
 
         // Fascia di prezzo — match diretto su simbolo
-        if (price != null && !price.equals("Qualsiasi")
+        if (!isBlank(price) && !"Qualsiasi".equalsIgnoreCase(price)
+                && !matchesPrice(r, price)
                 && !price.equalsIgnoreCase(r.getPrice())) {
             return false;
         }
 
         // Rating — se vuoi implementarlo: parse "3★" in 3, ecc.
-        if (stars != null && !stars.equals("Qualsiasi")
-                && r.getReviews() != null && !r.getReviews().isEmpty()) {
-            int selectedStars = parseStars(stars);
-            double avg = r.getReviews().stream().mapToDouble(Review::getStars).average().orElse(0);
-            int flooredAvg = (int) Math.floor(avg);
-            if (flooredAvg != selectedStars) {
-                return false;
-            }
+        if (!isBlank(stars) && !"Qualsiasi".equalsIgnoreCase(stars)
+                && !matchesMinimumStars(r, stars)) {
+            return false;
         }
 
         // Delivery
-        if (deliveryAvailable && !containsIgnoreCase(r.getFacilities(), "delivery")) {
+        if (deliveryAvailable && !hasDelivery(r)) {
             return false;
         }
 
         // Prenotazione online
-        if (onlineBookingAvailable && !containsIgnoreCase(r.getFacilities(), "prenotazione")) {
+        if (onlineBookingAvailable && !hasOnlineBooking(r)) {
             return false;
         }
 
         return true;
     }
 
-    private int parseStars(String starsStr) {
-        // Esempio: "3★" → 3
+    /**
+     * Checks whether the restaurant price range matches the selected filter.
+     * The comparison is based on the price level, not on the specific currency symbol.
+     *
+     * @param r The restaurant to evaluate
+     * @param selectedPrice The price range selected in the filter
+     * @return true if the restaurant matches the selected price range, false otherwise
+     */
+    private boolean matchesPrice(Restaurant r, String selectedPrice) {
+        int selectedLevel = priceLevel(selectedPrice);
+        int restaurantLevel = priceLevel(r.getPrice());
+
+        if (restaurantLevel == 0) {
+            restaurantLevel = priceLevel(r.getDescription());
+        }
+
+        return selectedLevel == 0 || selectedLevel == restaurantLevel;
+    }
+
+    /**
+     * Calculates the price level by counting currency symbols in the given text.
+     * For example, "€", "$" or "£" are level 1, while "€€€" or "$$$" are level 3.
+     *
+     * @param value The text containing the price information
+     * @return The detected price level, from 0 to 4
+     */
+    private int priceLevel(String value) {
+        if (isBlank(value)) {
+            return 0;
+        }
+
+        int level = 0;
+        for (char c : value.toCharArray()) {
+            if (isCurrencySymbol(c)) {
+                level++;
+            }
+        }
+
+        return Math.min(level, 4);
+    }
+
+    /**
+     * Takes the correct currencySymbol in the given text
+     * @param c the char to cast to currencySymbol
+     * @return correct currency
+     */
+    private boolean isCurrencySymbol(char c) {
+    return c == '€'
+            || c == '$'
+            || c == '£'
+            || c == '¥'
+            || c == '₩'
+            || c == '₹'
+            || c == '₽'
+            || c == '₺'
+            || c == '₴'
+            || c == '₫'
+            || Character.getType(c) == Character.CURRENCY_SYMBOL;
+    }
+
+    /**
+     * Checks whether the restaurant average review score is at least the selected value.
+     * Restaurants without reviews do not match when a minimum rating is selected.
+     *
+     * @param r The restaurant to evaluate
+     * @param selectedStars The minimum rating selected in the filter
+     * @return true if the average rating is high enough, false otherwise
+     */
+    private boolean matchesMinimumStars(Restaurant r, String selectedStars) {
+        int minStars = parseInteger(selectedStars);
+        if (minStars <= 0) {
+            return true;
+        }
+
+        if (r.getReviews() == null || r.getReviews().isEmpty()) {
+            return false;
+        }
+
+        double average = r.getReviews().stream()
+                .mapToInt(Review::getStars)
+                .average()
+                .orElse(0);
+
+        return average >= minStars;
+    }
+
+    /**
+     * Checks whether the restaurant appears to offer delivery or takeaway services.
+     * The check is based on keywords found in the restaurant searchable text.
+     *
+     * @param r The restaurant to evaluate
+     * @return true if delivery-related keywords are found, false otherwise
+     */
+    private boolean hasDelivery(Restaurant r) {
+        String text = searchableText(r);
+
+        return containsAny(text,
+                "delivery",
+                "home delivery",
+                "takeaway",
+                "take away",
+                "to go",
+                "asporto",
+                "consegna",
+                "consegna a domicilio",
+                "da asporto");
+    }
+
+    /**
+     * Checks whether the restaurant appears to support online booking.
+     * If no booking keyword is found, the presence of a website is used as a fallback.
+     *
+     * @param r The restaurant to evaluate
+     * @return true if online booking is detected or inferred, false otherwise
+     */
+    private boolean hasOnlineBooking(Restaurant r) {
+        String text = searchableText(r);
+
+        if (containsAny(text,
+                "online booking",
+                "book online",
+                "booking online",
+                "book a table",
+                "reserve online",
+                "reservation",
+                "reservations",
+                "prenotazione",
+                "prenotazioni",
+                "prenota online")) {
+            return true;
+        }
+
+        return !isBlank(r.getWebsiteUrl());
+    }
+
+    /**
+     * Builds a single searchable text from the restaurant fields useful for service filters.
+     * This allows delivery and booking checks to inspect facilities, description and URLs together.
+     *
+     * @param r The restaurant whose fields are combined
+     * @return A single text containing the searchable restaurant information
+     */
+    private String searchableText(Restaurant r) {
+        return String.join(" ",
+                safe(r.getFacilities()),
+                safe(r.getDescription()),
+                safe(r.getWebsiteUrl()),
+                safe(r.getMichelinUrl()));
+    }
+
+    /**
+     * Checks whether the given text contains at least one of the provided keywords.
+     * Matching is case-insensitive.
+     *
+     * @param text The text to inspect
+     * @param keywords The keywords to search for
+     * @return true if at least one keyword is found, false otherwise
+     */
+    private boolean containsAny(String text, String... keywords) {
+        for (String keyword : keywords) {
+            if (containsIgnoreCase(text, keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Compares two strings ignoring letter case.
+     * Null values are treated as non-matching.
+     *
+     * @param a The first string
+     * @param b The second string
+     * @return true if both strings are non-null and equal ignoring case, false otherwise
+     */
+    private boolean equalsIgnoreCase(String a, String b) {
+        return a != null && b != null && a.equalsIgnoreCase(b);
+    }
+
+    /**
+     * Parses an integer value from a string.
+     * Returns -1 when the text is not a valid number.
+     *
+     * @param value The string to parse
+     * @return The parsed integer, or -1 if parsing fails
+     */
+    private int parseInteger(String value) {
         try {
-            return Integer.parseInt(starsStr.replace("★", "").trim());
+            return Integer.parseInt(value.trim());
         } catch (Exception e) {
             return -1;
         }
+    }
+
+    /**
+     * Checks whether a string is null, empty or made only of whitespace.
+     *
+     * @param value The string to check
+     * @return true if the string is null or blank, false otherwise
+     */
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    /**
+     * Converts a possibly null string into a non-null value.
+     * Useful when building searchable text from optional restaurant fields.
+     *
+     * @param value The original string
+     * @return The original value, or an empty string if it is null
+     */
+    private String safe(String value) {
+        return value == null ? "" : value;
     }
 
     /**

@@ -115,7 +115,7 @@ public class FiltersController {
         locationField.setText(currentCity == null ? "" : currentCity);
 
         // Average price $
-        priceCombo.setItems(FXCollections.observableArrayList("Qualsiasi", "$", "$$", "$$$", "$$$$"));
+        priceCombo.setItems(FXCollections.observableArrayList("Qualsiasi", "€", "€€", "€€€", "€€€€"));
         priceCombo.setValue(filters.getPrice() == null ? "Qualsiasi" : filters.getPrice());
 
         // Stelle
