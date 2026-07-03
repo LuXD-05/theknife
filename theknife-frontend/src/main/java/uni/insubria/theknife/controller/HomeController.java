@@ -595,8 +595,18 @@ public class HomeController {
 
 
     //#region HANDLE ADD RESTAURANTS
+    /**
+     * Handles the creation of a new restaurant by opening a dialog form.
+     * <p>
+     * The user can insert the main restaurant information, while some fields
+     * are selected from predefined values to avoid invalid data. Optional fields,
+     * such as latitude and longitude, can be left empty.
+     * </p>
+     */
     @FXML
     private void handleAddRestaurant() {
+
+        // Create the dialog used to insert the new restaurant data
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Add New Restaurant");
         dialog.setHeaderText("Enter new restaurant details");
@@ -609,6 +619,7 @@ public class HomeController {
 
         List<String> availableCuisines = SessionService.getCuisines();
 
+        // Cuisine can be typed and selected from the available dataset values
         ComboBox<String> cuisineCombo = new ComboBox<>();
         cuisineCombo.getItems().addAll(availableCuisines);
         cuisineCombo.setEditable(true);
@@ -624,6 +635,7 @@ public class HomeController {
 
         cuisineBinding.setOnAutoCompleted(event -> cuisineCombo.setValue(event.getCompletion()));
 
+        // Price, award and green star are constrained to avoid free invalid values
         ComboBox<String> priceCombo = new ComboBox<>();
         priceCombo.getItems().addAll("$", "$$", "$$$", "$$$$");
         priceCombo.setPromptText("Select price range");
@@ -684,6 +696,8 @@ public class HomeController {
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+
+        // Validate fields before closing the dialog, so inserted data is not lost
         okButton.addEventFilter(ActionEvent.ACTION, event -> {
             String error = validateNewRestaurantFields(
                     nameField,
@@ -743,6 +757,7 @@ public class HomeController {
 
                 RestaurantRepository.ERROR_CODE result = RestaurantRepository.addRestaurant(newRestaurant);
 
+                // Create the restaurant only after all fields have been validated
                 if (result == RestaurantRepository.ERROR_CODE.NONE) {
                     addNewRestaurantToCurrentUser(newRestaurant);
                     displayRestaurants();
@@ -760,6 +775,15 @@ public class HomeController {
         });
     }
 
+    /**
+     * Validates the fields used to create a new restaurant.
+     * <p>
+     * The method returns the first validation error found, so the dialog can stay
+     * open and the user can fix only the wrong value without losing the other data.
+     * </p>
+     *
+     * @return the validation error message, or null if all fields are valid
+     */
     private String validateNewRestaurantFields(
             TextField nameField,
             TextField addressField,
@@ -821,6 +845,7 @@ public class HomeController {
             return "Invalid website URL format.";
         }
 
+        // Latitude and longitude are optional: the restaurant can be saved without them
         String longitude = longitudeField.getText() == null ? "" : longitudeField.getText().trim();
         if (!longitude.isBlank()) {
             try {
@@ -860,7 +885,17 @@ public class HomeController {
         return null;
     }
 
-    
+
+    /**
+     * Reads the selected or typed value from a combo box.
+     * <p>
+     * This is useful for editable combo boxes, where the value can be either chosen
+     * from the list or typed directly in the input field.
+     * </p>
+     *
+     * @param comboBox the combo box to read
+     * @return the selected text, or an empty string if no value is present
+     */
     private String getComboText(ComboBox<String> comboBox) {
     if (comboBox == null) {
         return "";
