@@ -1,0 +1,26 @@
+appunti del quality manager
+
+ELEMENTI DA SISTEMARE DAL LAB A:
+    radiobutton cliente-ristoratore
+    manuali da ampliare (io)
+    filtri sulle facilities (delivery e prenotazione online)
+    errore green star
+
+ELEMENTI DA IMPLEMENTARE PER LAB B:
+    database postgresql
+    separazione backend e frontend
+    comunicazione client-server
+
+
+MIGLIORIE DA EFFETTUARE:
+    problemi con lista preferiti
+        quando inserisco un ristorante in lista preferiti lo vedo, 
+        ma quando effettuo logout e accedo nuovamente, vedo la lista di elementi null
+    problemi con l'inserimento di un nuovo ristorante
+        posso scrivere quello che voglio nei campi dove non potrei (premi, fascia di prezzo, cucina)
+        non possiamo pretendere che un ristoratore sappia lat e long del suo ristorante
+        se commetto errori vengono mostrati dopo l'invio, cancellando tutti i dati precedentemente messi
+        (fastidioso)
+        fascia di prezzo da selezionare come le stelle delle recensioni (non string libero)
+        mancano rb da spuntare per delivery e prenotazione online
+        mancano da inserire le facilities
