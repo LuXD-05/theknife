@@ -597,28 +597,59 @@ public class HomeController {
     //#region HANDLE ADD RESTAURANTS
     @FXML
     private void handleAddRestaurant() {
-        // Create a dialog window for new restaurant data input
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Add New Restaurant");
         dialog.setHeaderText("Enter new restaurant details");
 
-        // Create empty input fields
         TextField nameField = new TextField();
         TextField addressField = new TextField();
         TextField locationField = new TextField();
         TextField phoneField = new TextField();
-        TextField cuisineField = new TextField();
         TextField websiteField = new TextField();
 
-        TextField priceField = new TextField();
+        List<String> availableCuisines = SessionService.getCuisines();
+
+        ComboBox<String> cuisineCombo = new ComboBox<>();
+        cuisineCombo.getItems().addAll(availableCuisines);
+        cuisineCombo.setEditable(true);
+        cuisineCombo.setPromptText("Type or select cuisine");
+
+        AutoCompletionBinding<String> cuisineBinding = TextFields.bindAutoCompletion(cuisineCombo.getEditor(), param -> {
+            String userText = param.getUserText() == null ? "" : param.getUserText().toLowerCase();
+
+            return availableCuisines.stream()
+                    .filter(cuisine -> cuisine.toLowerCase().contains(userText))
+                    .collect(Collectors.toList());
+        });
+
+        cuisineBinding.setOnAutoCompleted(event -> cuisineCombo.setValue(event.getCompletion()));
+
+        ComboBox<String> priceCombo = new ComboBox<>();
+        priceCombo.getItems().addAll("$", "$$", "$$$", "$$$$");
+        priceCombo.setPromptText("Select price range");
+
         TextField longitudeField = new TextField();
+        longitudeField.setPromptText("Optional");
+
         TextField latitudeField = new TextField();
-        TextField awardField = new TextField();
+        latitudeField.setPromptText("Optional");
+
+        ComboBox<String> awardCombo = new ComboBox<>();
+        awardCombo.getItems().addAll(
+                "Selected Restaurants",
+                "Bib Gourmand",
+                "1 Star",
+                "2 Stars",
+                "3 Stars"
+        );
+        awardCombo.setPromptText("Select award");
+
         TextField greenStarField = new TextField();
+        greenStarField.setPromptText("Optional: 0 or 1");
+
         TextArea descriptionArea = new TextArea();
         descriptionArea.setPrefRowCount(4);
 
-        // Layout the fields in a grid
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -633,18 +664,17 @@ public class HomeController {
         grid.add(new Label("Phone:"), 0, 3);
         grid.add(phoneField, 1, 3);
         grid.add(new Label("Cuisine:"), 0, 4);
-        grid.add(cuisineField, 1, 4);
+        grid.add(cuisineCombo, 1, 4);
         grid.add(new Label("Website URL:"), 0, 5);
         grid.add(websiteField, 1, 5);
-
         grid.add(new Label("Price:"), 0, 6);
-        grid.add(priceField, 1, 6);
-        grid.add(new Label("Longitude:"), 0, 7);
+        grid.add(priceCombo, 1, 6);
+        grid.add(new Label("Longitude (optional):"), 0, 7);
         grid.add(longitudeField, 1, 7);
-        grid.add(new Label("Latitude:"), 0, 8);
+        grid.add(new Label("Latitude (optional):"), 0, 8);
         grid.add(latitudeField, 1, 8);
         grid.add(new Label("Award:"), 0, 9);
-        grid.add(awardField, 1, 9);
+        grid.add(awardCombo, 1, 9);
         grid.add(new Label("Green Star:"), 0, 10);
         grid.add(greenStarField, 1, 10);
         grid.add(new Label("Description:"), 0, 11);
@@ -653,137 +683,199 @@ public class HomeController {
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
+        Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+        okButton.addEventFilter(ActionEvent.ACTION, event -> {
+            String error = validateNewRestaurantFields(
+                    nameField,
+                    addressField,
+                    locationField,
+                    phoneField,
+                    websiteField,
+                    longitudeField,
+                    latitudeField,
+                    greenStarField,
+                    priceCombo,
+                    cuisineCombo,
+                    awardCombo
+            );
+
+            if (error != null) {
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR, error);
+                errorAlert.showAndWait();
+                event.consume();
+            }
+        });
+
         dialog.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                try {
-                    // --- VALIDAZIONI ---
+                Restaurant newRestaurant = new Restaurant();
 
-                    if (nameField.getText().isBlank()) {
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Name is mandatory.");
-                        errorAlert.showAndWait();
-                        return;
-                    }
+                newRestaurant.setName(nameField.getText().trim());
+                newRestaurant.setAddress(addressField.getText().trim());
+                newRestaurant.setLocation(locationField.getText().trim());
+                newRestaurant.setPhone(phoneField.getText().trim());
+                newRestaurant.setCuisine(getComboText(cuisineCombo));
+                newRestaurant.setWebsiteUrl(websiteField.getText().trim());
+                newRestaurant.setPrice(priceCombo.getValue());
 
-                    // 1) Location: nessun numero consentito
-                    if (locationField.getText().matches(".*\\d.*")) {
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Location cannot contain numbers.");
-                        errorAlert.showAndWait();
-                        return;
-                    }
+                if (longitudeField.getText() == null || longitudeField.getText().isBlank()) {
+                    newRestaurant.setLongitude(null);
+                } else {
+                    newRestaurant.setLongitude(Float.parseFloat(longitudeField.getText().trim()));
+                }
 
-                    // 2) Latitudine: numero float tra -90 e 90
-                    Float lat = null;
-                    if (latitudeField.getText().isBlank()) {
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Latitude is mandatory.");
-                        errorAlert.showAndWait();
-                        return;
-                    } else {
-                        lat = Float.parseFloat(latitudeField.getText().trim());
-                        if (lat < -90f || lat > 90f) {
-                            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Latitude must be between -90 and 90.");
-                            errorAlert.showAndWait();
-                            return;
-                        }
-                    }
+                if (latitudeField.getText() == null || latitudeField.getText().isBlank()) {
+                    newRestaurant.setLatitude(null);
+                } else {
+                    newRestaurant.setLatitude(Float.parseFloat(latitudeField.getText().trim()));
+                }
 
-                    // 3) Longitudine: numero float tra -180 e 180
-                    Float lon = null;
-                    if (longitudeField.getText().isBlank()) {
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Longitude is mandatory.");
-                        errorAlert.showAndWait();
-                        return;
-                    } else {
-                        lon = Float.parseFloat(longitudeField.getText().trim());
-                        if (lon < -180f || lon > 180f) {
-                            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Longitude must be between -180 and 180.");
-                            errorAlert.showAndWait();
-                            return;
-                        }
-                    }
+                newRestaurant.setAward(awardCombo.getValue());
 
-                    // 4) Numero di telefono internazionale (esempio regex)
-                    String phoneRegex = "^\\+?[0-9. ()-]{7,25}$";
-                    if (!phoneField.getText().isBlank() && !phoneField.getText().matches(phoneRegex)) {
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Invalid international phone number format.");
-                        errorAlert.showAndWait();
-                        return;
-                    }
+                if (greenStarField.getText() == null || greenStarField.getText().isBlank()) {
+                    newRestaurant.setGreenStar(null);
+                } else {
+                    newRestaurant.setGreenStar(Integer.parseInt(greenStarField.getText().trim()));
+                }
 
-                    // 5) URL sito web semplice (esempio regex per http(s)://...)
-                    String urlRegex = "^(https?://)?([\\w.-]+)\\.([a-z]{2,6})([/\\w .-]*)*/?$";
-                    if (!websiteField.getText().isBlank() && !websiteField.getText().matches(urlRegex)) {
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Invalid website URL format.");
-                        errorAlert.showAndWait();
-                        return;
-                    }
+                newRestaurant.setDescription(descriptionArea.getText());
+                newRestaurant.setId(RestaurantRepository.generateUniqueId(newRestaurant));
 
-                    // 6) Green Star: solo 0 o 1
-                    Integer greenStar = null;
-                    if (!greenStarField.getText().isBlank()) {
-                        greenStar = Integer.parseInt(greenStarField.getText().trim());
-                        if (greenStar != 0 && greenStar != 1) {
-                            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Green Star must be 0 or 1.");
-                            errorAlert.showAndWait();
-                            return;
-                        }
-                    }
+                RestaurantRepository.ERROR_CODE result = RestaurantRepository.addRestaurant(newRestaurant);
 
+                if (result == RestaurantRepository.ERROR_CODE.NONE) {
+                    addNewRestaurantToCurrentUser(newRestaurant);
+                    displayRestaurants();
 
-                    // Create new restaurant object and set fields
-                    Restaurant newRestaurant = new Restaurant();
-
-                    newRestaurant.setName(nameField.getText());
-                    newRestaurant.setAddress(addressField.getText());
-                    newRestaurant.setLocation(locationField.getText());
-                    newRestaurant.setPhone(phoneField.getText());
-                    newRestaurant.setCuisine(cuisineField.getText());
-                    newRestaurant.setWebsiteUrl(websiteField.getText());
-                    newRestaurant.setPrice(priceField.getText());
-
-                    // Parse floats and integer with validation
-                    if (!longitudeField.getText().isBlank())
-                        newRestaurant.setLongitude(Float.parseFloat(longitudeField.getText().trim()));
-
-                    if (!latitudeField.getText().isBlank())
-                        newRestaurant.setLatitude(Float.parseFloat(latitudeField.getText().trim()));
-
-                    newRestaurant.setAward(awardField.getText());
-
-                    if (!greenStarField.getText().isBlank())
-                        newRestaurant.setGreenStar(Integer.parseInt(greenStarField.getText().trim()));
-
-                    newRestaurant.setDescription(descriptionArea.getText());
-
-                    // Generate a unique id based on name, latitude, longitude (same logic as in repository)
-                    newRestaurant.setId(RestaurantRepository.generateUniqueId(newRestaurant));
-
-                    // Add new restaurant to repository
-                    RestaurantRepository.ERROR_CODE result = RestaurantRepository.addRestaurant(newRestaurant);
-
-                    if (result == RestaurantRepository.ERROR_CODE.NONE) {
-                        // Associa il nuovo ristorante all'utente corrente
-                        addNewRestaurantToCurrentUser(newRestaurant);
-
-                        // Refresh the UI list view
-                        displayRestaurants();
-
-                        Alert info = new Alert(Alert.AlertType.INFORMATION, "New restaurant added successfully!");
-                        info.showAndWait();
-                    } else if (result == RestaurantRepository.ERROR_CODE.DUPLICATED) {
-                        Alert warn = new Alert(Alert.AlertType.WARNING, "A restaurant with these details already exists.");
-                        warn.showAndWait();
-                    } else {
-                        Alert error = new Alert(Alert.AlertType.ERROR, "Failed to add new restaurant due to a service error.");
-                        error.showAndWait();
-                    }
-                } catch (NumberFormatException e) {
-                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Invalid number format for longitude, latitude or green star.");
-                    errorAlert.showAndWait();
+                    Alert info = new Alert(Alert.AlertType.INFORMATION, "New restaurant added successfully!");
+                    info.showAndWait();
+                } else if (result == RestaurantRepository.ERROR_CODE.DUPLICATED) {
+                    Alert warn = new Alert(Alert.AlertType.WARNING, "A restaurant with these details already exists.");
+                    warn.showAndWait();
+                } else {
+                    Alert error = new Alert(Alert.AlertType.ERROR, "Failed to add new restaurant due to a service error.");
+                    error.showAndWait();
                 }
             }
         });
     }
 
+    private String validateNewRestaurantFields(
+            TextField nameField,
+            TextField addressField,
+            TextField locationField,
+            TextField phoneField,
+            TextField websiteField,
+            TextField longitudeField,
+            TextField latitudeField,
+            TextField greenStarField,
+            ComboBox<String> priceCombo,
+            ComboBox<String> cuisineCombo,
+            ComboBox<String> awardCombo
+    ) {
+        if (nameField.getText() == null || nameField.getText().isBlank()) {
+            return "Name is mandatory.";
+        }
 
+        if (addressField.getText() == null || addressField.getText().isBlank()) {
+            return "Address is mandatory.";
+        }
+
+        if (locationField.getText() == null || locationField.getText().isBlank()) {
+            return "Location is mandatory.";
+        }
+
+        if (locationField.getText().matches(".*\\d.*")) {
+            return "Location cannot contain numbers.";
+        }
+
+        if (priceCombo.getValue() == null) {
+            return "Price range is mandatory.";
+        }
+
+        String selectedCuisine = getComboText(cuisineCombo);
+        if (selectedCuisine.isBlank()) {
+            return "Cuisine is mandatory.";
+        }
+
+        boolean validCuisine = SessionService.getCuisines().stream()
+                .anyMatch(cuisine -> cuisine.equalsIgnoreCase(selectedCuisine));
+
+        if (!validCuisine) {
+            return "Select a valid cuisine from the suggestions.";
+        }
+
+        if (awardCombo.getValue() == null || awardCombo.getValue().isBlank()) {
+            return "Award is mandatory.";
+        }
+
+        String phone = phoneField.getText() == null ? "" : phoneField.getText().trim();
+        String phoneRegex = "^\\+?[0-9. ()-]{7,25}$";
+        if (!phone.isBlank() && !phone.matches(phoneRegex)) {
+            return "Invalid international phone number format.";
+        }
+
+        String website = websiteField.getText() == null ? "" : websiteField.getText().trim();
+        String urlRegex = "^(https?://)?([\\w.-]+)\\.([a-z]{2,6})([/\\w .-]*)*/?$";
+        if (!website.isBlank() && !website.matches(urlRegex)) {
+            return "Invalid website URL format.";
+        }
+
+        String longitude = longitudeField.getText() == null ? "" : longitudeField.getText().trim();
+        if (!longitude.isBlank()) {
+            try {
+                float lon = Float.parseFloat(longitude);
+                if (lon < -180f || lon > 180f) {
+                    return "Longitude must be between -180 and 180.";
+                }
+            } catch (NumberFormatException e) {
+                return "Longitude must be a valid number.";
+            }
+        }
+
+        String latitude = latitudeField.getText() == null ? "" : latitudeField.getText().trim();
+        if (!latitude.isBlank()) {
+            try {
+                float lat = Float.parseFloat(latitude);
+                if (lat < -90f || lat > 90f) {
+                    return "Latitude must be between -90 and 90.";
+                }
+            } catch (NumberFormatException e) {
+                return "Latitude must be a valid number.";
+            }
+        }
+
+        String greenStar = greenStarField.getText() == null ? "" : greenStarField.getText().trim();
+        if (!greenStar.isBlank()) {
+            try {
+                int value = Integer.parseInt(greenStar);
+                if (value != 0 && value != 1) {
+                    return "Green Star must be 0 or 1.";
+                }
+            } catch (NumberFormatException e) {
+                return "Green Star must be a valid number.";
+            }
+        }
+
+        return null;
+    }
+
+    
+    private String getComboText(ComboBox<String> comboBox) {
+    if (comboBox == null) {
+        return "";
+    }
+
+    String editorText = comboBox.isEditable() && comboBox.getEditor() != null
+            ? comboBox.getEditor().getText()
+            : null;
+
+    if (editorText != null && !editorText.isBlank()) {
+        return editorText.trim();
+    }
+
+    String value = comboBox.getValue();
+    return value == null ? "" : value.trim();
+}
     //#endregion
 }
