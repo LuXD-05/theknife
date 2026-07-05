@@ -155,6 +155,10 @@ public class HomeController {
         if (role == Role.CLIENTE) {
             favoritesToggle.setVisible(true);
             favoritesToggle.setManaged(true);
+            openFiltersBtn.setVisible(true);
+            openFiltersBtn.setManaged(true);
+            clearFiltersBtn.setVisible(true);
+            clearFiltersBtn.setManaged(true);
             favoritesToggle.setText("Mostra preferiti");
             reviewedToggle.setVisible(true);
             reviewedToggle.setManaged(true);
@@ -164,6 +168,10 @@ public class HomeController {
         } else if (role == Role.RISTORATORE) {
             favoritesToggle.setVisible(false);
             favoritesToggle.setManaged(false);
+            openFiltersBtn.setVisible(false);
+            openFiltersBtn.setManaged(false);
+            clearFiltersBtn.setVisible(false);
+            clearFiltersBtn.setManaged(false);
             reviewedToggle.setVisible(false);
             reviewedToggle.setManaged(false);
             addRestaurantBtn.setVisible(true);
@@ -627,10 +635,10 @@ public class HomeController {
         priceCombo.setPromptText("Select price range");
 
         TextField longitudeField = new TextField();
-        longitudeField.setPromptText("Optional");
+        longitudeField.setPromptText("Between -180° & 180°");
 
         TextField latitudeField = new TextField();
-        latitudeField.setPromptText("Optional");
+        latitudeField.setPromptText("Between -90° & 90°");
 
         ComboBox<String> awardCombo = new ComboBox<>();
         awardCombo.getItems().addAll(
