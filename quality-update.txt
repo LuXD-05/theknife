@@ -1,31 +1,22 @@
 appunti del quality manager
 
 ELEMENTI DA SISTEMARE DAL LAB A:
-    radiobutton cliente-ristoratore - FATTO
-    manuali da ampliare (io) - IN PROGRESS
-    filtri sulle facilities (delivery e prenotazione online) - RISOLVERE
-    errore green star - FATTO
+    1. Implementare radiobutton cliente-ristoratore nella registrazione - FATTO
+    2. Ampliare i manuali - FATTO
+    3. Aggiungere filtri sulle facilities (delivery e prenotazione online) - RISOLVERE
+    4. Sistemare errore green star - FATTO
 
 ELEMENTI DA IMPLEMENTARE PER LAB B:
-    database postgresql -FATTO
-    separazione backend e frontend - FATTO
-    comunicazione client-server - FATTO
+    1. Creare database postgresql -FATTO
+    2. Separare backend e frontend - FATTO
+    3. Gestire comunicazione client-server - FATTO
 
+Problemi da SISTEMARE  
+    1. La lista preferiti restituisce null-null se quando accedo avendo ristoranti salvati nei preferiti precedentemente (Cliente)
+    2. Serve il dropdown  nella sezione Location dell'add dei ristoranti (Ristoratore)
+    3. Latitude e Longitude sono stati messi opzionali, ma se li lascio vuoti non vedo la maggior parte degli altri campi (RIS)
+    4. Sarebbe opportuno mettere un hint su Latitude e Longitude per far mettere i valori nel range giusto
+    5. I filti di ricerca del RIS non funzionano
+    6. Valutare se tenere i filtri di ricerca per i ristoratori
+    7. Le fasce di prezzo dei ristoranti aggiunti hanno tutti fascia di prezzo in $, mentre i ristoranti base hanno la valuta del loro paese (opzionale)
 
-MIGLIORIE DA EFFETTUARE:
-    problemi con lista preferiti
-        quando inserisco un ristorante in lista preferiti lo vedo, - RISOLVERE
-        ma quando effettuo logout e accedo nuovamente, vedo la lista di elementi null - RISOLVERE
-    problemi con l'inserimento di un nuovo ristorante
-        posso scrivere quello che voglio nei campi dove non potrei (premi, fascia di prezzo, cucina) - FATTO
-        non possiamo pretendere che un ristoratore sappia lat e long del suo ristorante - FATTO
-        se commetto errori vengono mostrati dopo l'invio, cancellando tutti i dati precedentemente messi
-        (fastidioso) - FATTO
-        fascia di prezzo da selezionare come le stelle delle recensioni (non string libero) - FATTO
-        mancano rb da spuntare per delivery e prenotazione online
-        mancano da inserire le facilities
-
-ULTIME COSE CHE MANCANO:
-    problema lista preferiti
-    rb per delivery e prenotazione online
-    facilities (String)
