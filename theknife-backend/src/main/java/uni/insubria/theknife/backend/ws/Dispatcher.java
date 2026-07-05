@@ -61,6 +61,7 @@ public class Dispatcher {
                 case EDIT_REVIEW -> review.edit(req, state);
                 case DELETE_REVIEW -> review.delete(req, state);
                 case TOGGLE_FAVORITE -> favorite.toggle(req, state);
+                case GET_FAVORITES -> favorite.getFavorites(req, state);
                 default -> HandlerResult.of(Envelope.error(req.action(), req.correlationId(),
                         ErrorCode.VALIDATION, "Azione non supportata: " + req.action()));
             };

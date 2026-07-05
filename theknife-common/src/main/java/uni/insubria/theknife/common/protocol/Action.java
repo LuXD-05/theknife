@@ -36,6 +36,7 @@ public enum Action {
 
     // --- Favorites (CLIENTE) ---
     TOGGLE_FAVORITE,
+    GET_FAVORITES,
 
     // --- Broadcast events (server -> clients) ---
     RESTAURANT_ADDED,

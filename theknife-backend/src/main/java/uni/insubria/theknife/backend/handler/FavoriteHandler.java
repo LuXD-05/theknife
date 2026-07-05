@@ -6,6 +6,8 @@ Morosini Luca 760029 VA
 */
 package uni.insubria.theknife.backend.handler;
 
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -13,6 +15,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import uni.insubria.theknife.backend.entity.FavoriteEntity;
 import uni.insubria.theknife.backend.entity.FavoriteId;
+import uni.insubria.theknife.backend.entity.RestaurantEntity;
 import uni.insubria.theknife.backend.repository.FavoriteRepository;
 import uni.insubria.theknife.backend.repository.RestaurantRepository;
 import uni.insubria.theknife.backend.ws.ConnectionState;
@@ -68,4 +71,25 @@ public class FavoriteHandler {
                 mapper.valueToTree(favorites.favoriteRestaurantIds(username)));
         return HandlerResult.of(Envelope.ok(Action.TOGGLE_FAVORITE, req.correlationId(), payload));
     }
+
+    public HandlerResult getFavorites(Envelope req, ConnectionState state) {
+        if (!state.isAuthenticated()) {
+            return HandlerResult.of(Envelope.error(Action.TOGGLE_FAVORITE, req.correlationId(),
+                    ErrorCode.UNAUTHORIZED, "Devi effettuare l'accesso"));
+        }
+        String username = req.payload() == null ? null : req.payload().path("username").asText(null);
+        if (username == null) {
+            return HandlerResult.of(Envelope.error(Action.TOGGLE_FAVORITE, req.correlationId(),
+                    ErrorCode.VALIDATION, "Nome utente mancante"));
+        }
+        
+        List<RestaurantEntity> favs = favorites.favoriteRestaurantIds(username).stream().map(id -> {
+            return restaurants.findById(id);
+        }).toList();
+
+        ObjectNode payload = mapper.createObjectNode();
+        payload.set("favoriteRestaurants", mapper.valueToTree(favs));
+        return HandlerResult.of(Envelope.ok(Action.GET_FAVORITES, req.correlationId(), payload));
+    }
+
 }
