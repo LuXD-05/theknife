@@ -92,6 +92,44 @@ public class RestaurantRepository {
         }
     }
 
+    /**
+     * Loads the restaurants the authenticated CLIENTE favorited (any city), with embedded
+     * reviews. Used by the home view's favorites toggle so favorites are shown regardless of
+     * the currently selected city.
+     */
+    public static Map<String, Restaurant> loadMyFavorites() {
+        return loadMyRestaurantList(Action.LIST_MY_FAVORITES);
+    }
+
+    /**
+     * Loads the restaurants the authenticated CLIENTE reviewed (any city), with embedded
+     * reviews. Used by the home view's reviewed toggle so reviewed restaurants are shown
+     * regardless of the currently selected city.
+     */
+    public static Map<String, Restaurant> loadMyReviewed() {
+        return loadMyRestaurantList(Action.LIST_MY_REVIEWED);
+    }
+
+    /** Shared loader for the per-user restaurant lists (owned/favorites/reviewed). */
+    private static Map<String, Restaurant> loadMyRestaurantList(Action action) {
+        try {
+            Envelope response = BackendClient.get().sendAndWait(action, null);
+            if (response.error() != ErrorCode.NONE || response.payload() == null) {
+                return new LinkedHashMap<>();
+            }
+            List<RestaurantDto> dtos = BackendClient.get().mapper()
+                    .convertValue(response.payload(), new TypeReference<List<RestaurantDto>>() {
+                    });
+            Map<String, Restaurant> map = new LinkedHashMap<>();
+            for (Restaurant r : DtoMapper.toModelList(dtos)) {
+                map.put(r.getId(), r);
+            }
+            return map;
+        } catch (Exception e) {
+            return new LinkedHashMap<>();
+        }
+    }
+
     /** Distinct locations from the backend (for the city autocomplete). */
     public static List<String> loadLocations() {
         return loadStringList(Action.GET_LOCATIONS);

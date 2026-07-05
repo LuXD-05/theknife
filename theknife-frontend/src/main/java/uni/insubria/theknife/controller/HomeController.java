@@ -27,19 +27,13 @@ import uni.insubria.theknife.model.Review;
 import uni.insubria.theknife.model.Role;
 import uni.insubria.theknife.model.User;
 import uni.insubria.theknife.repository.RestaurantRepository;
-import uni.insubria.theknife.repository.ReviewsRepository;
 import uni.insubria.theknife.service.AlertService;
 import uni.insubria.theknife.service.SessionService;
 import uni.insubria.theknife.util.DistanceCalculator;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -525,9 +519,13 @@ public class HomeController {
 
         // Shows favorites if toggled, otherwise restaurants normally
         if (toggled) {
-            User user = SessionService.getUserFromSession();
             listPlaceholder.setText("Nessun ristorante preferito.");
-            setupRestaurantListView(new ArrayList<>(user.getRestaurants()));
+            // Fetched from the backend across all cities: the in-memory catalog is scoped to a
+            // single city, so the favorite set on the user may only hold id-only stubs.
+            List<Restaurant> favorites = RestaurantRepository.loadMyFavorites().values().stream()
+                    .sorted(Comparator.comparing(Restaurant::getName, String.CASE_INSENSITIVE_ORDER))
+                    .collect(Collectors.toList());
+            setupRestaurantListView(favorites);
         } else {
             listPlaceholder.setText("Nessun ristorante trovato per la location selezionata.");
             displayRestaurants();
@@ -549,22 +547,10 @@ public class HomeController {
         if (toggled) {
             listPlaceholder.setText("Nessun ristorante recensito.");
 
-            // Get user in session & all restaurants
-            User user = SessionService.getUserFromSession();
-            List<Restaurant> restaurants = SessionService.getRestaurants();
-
-            // Get only restaurants reviewed by user in session + display them
-            List<Restaurant> reviewedRestaurants = ReviewsRepository.loadReviews().values().stream()
-                    .filter(review -> review.getUser() != null && review.getUser().getUsername().equals(user.getUsername()))
-                    .map(review -> {
-                        String restaurantId = review.getRestaurant().getId();
-                        return restaurants.stream()
-                                .filter(r -> r.getId().equals(restaurantId))
-                                .findFirst()
-                                .orElse(null);
-                    })
-                    .filter(Objects::nonNull)
-                    .distinct()
+            // Fetched from the backend across all cities: the in-memory catalog is scoped to a
+            // single city, so it only knows the reviews of the currently selected city.
+            List<Restaurant> reviewedRestaurants = RestaurantRepository.loadMyReviewed().values().stream()
+                    .sorted(Comparator.comparing(Restaurant::getName, String.CASE_INSENSITIVE_ORDER))
                     .collect(Collectors.toList());
             setupRestaurantListView(reviewedRestaurants);
         } else {

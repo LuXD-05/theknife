@@ -14,6 +14,7 @@ import uni.insubria.theknife.backend.entity.RestaurantEntity;
 import uni.insubria.theknife.backend.entity.ReviewEntity;
 import uni.insubria.theknife.backend.mapper.RestaurantMapper;
 import uni.insubria.theknife.backend.mapper.ReviewMapper;
+import uni.insubria.theknife.backend.repository.FavoriteRepository;
 import uni.insubria.theknife.backend.repository.RestaurantRepository;
 import uni.insubria.theknife.backend.repository.ReviewRepository;
 import uni.insubria.theknife.backend.ws.ConnectionState;
@@ -25,6 +26,7 @@ import uni.insubria.theknife.common.protocol.Envelope;
 import uni.insubria.theknife.common.protocol.ErrorCode;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,6 +42,8 @@ public class CatalogHandler {
     RestaurantRepository restaurants;
     @Inject
     ReviewRepository reviews;
+    @Inject
+    FavoriteRepository favorites;
     @Inject
     ObjectMapper mapper;
 
@@ -81,6 +85,49 @@ public class CatalogHandler {
         }
         return HandlerResult.of(Envelope.ok(Action.LIST_MY_RESTAURANTS, req.correlationId(),
                 mapper.valueToTree(result)));
+    }
+
+    @Transactional
+    public HandlerResult listMyFavorites(Envelope req, ConnectionState state) {
+        // A CLIENTE sees the restaurants they favorited, regardless of city.
+        if (!state.isAuthenticated()) {
+            return HandlerResult.of(Envelope.error(Action.LIST_MY_FAVORITES, req.correlationId(),
+                    ErrorCode.UNAUTHORIZED, "Non autenticato"));
+        }
+        List<RestaurantDto> result = buildRestaurantDtos(favorites.favoriteRestaurantIds(state.username()));
+        return HandlerResult.of(Envelope.ok(Action.LIST_MY_FAVORITES, req.correlationId(),
+                mapper.valueToTree(result)));
+    }
+
+    @Transactional
+    public HandlerResult listMyReviewed(Envelope req, ConnectionState state) {
+        // A CLIENTE sees the restaurants they reviewed, regardless of city.
+        if (!state.isAuthenticated()) {
+            return HandlerResult.of(Envelope.error(Action.LIST_MY_REVIEWED, req.correlationId(),
+                    ErrorCode.UNAUTHORIZED, "Non autenticato"));
+        }
+        List<RestaurantDto> result = buildRestaurantDtos(reviews.reviewedRestaurantIds(state.username()));
+        return HandlerResult.of(Envelope.ok(Action.LIST_MY_REVIEWED, req.correlationId(),
+                mapper.valueToTree(result)));
+    }
+
+    /**
+     * Assembles the {@link RestaurantDto}s (with embedded reviews) for the given restaurant ids,
+     * skipping any id that no longer resolves to a restaurant. Shared by the favorites/reviewed views.
+     */
+    private List<RestaurantDto> buildRestaurantDtos(Collection<String> restaurantIds) {
+        Map<String, List<ReviewDto>> byRestaurant = reviews.listAll().stream()
+                .map(ReviewMapper::toDto)
+                .collect(Collectors.groupingBy(ReviewDto::restaurantId));
+
+        List<RestaurantDto> result = new ArrayList<>();
+        for (String id : restaurantIds) {
+            RestaurantEntity e = restaurants.findById(id);
+            if (e != null) {
+                result.add(RestaurantMapper.toDto(e, byRestaurant.getOrDefault(e.id, List.of())));
+            }
+        }
+        return result;
     }
 
     @Transactional

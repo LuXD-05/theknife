@@ -20,6 +20,8 @@ public enum Action {
     // --- Reference / bootstrap data ---
     LIST_RESTAURANTS,
     LIST_MY_RESTAURANTS,
+    LIST_MY_FAVORITES,
+    LIST_MY_REVIEWED,
     GET_RESTAURANT,
     GET_LOCATIONS,
     GET_CUISINES,

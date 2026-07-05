@@ -51,6 +51,8 @@ public class Dispatcher {
                 case LOGOUT -> auth.logout(req, state);
                 case LIST_RESTAURANTS -> catalog.listRestaurants(req);
                 case LIST_MY_RESTAURANTS -> catalog.listMyRestaurants(req, state);
+                case LIST_MY_FAVORITES -> catalog.listMyFavorites(req, state);
+                case LIST_MY_REVIEWED -> catalog.listMyReviewed(req, state);
                 case GET_RESTAURANT -> catalog.getRestaurant(req);
                 case GET_LOCATIONS -> catalog.getLocations(req);
                 case GET_CUISINES -> catalog.getCuisines(req);

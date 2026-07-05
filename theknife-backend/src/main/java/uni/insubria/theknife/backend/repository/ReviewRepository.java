@@ -27,4 +27,13 @@ public class ReviewRepository implements PanacheRepositoryBase<ReviewEntity, Str
     public boolean existsForUserAndRestaurant(String username, String restaurantId) {
         return count("username = ?1 and restaurantId = ?2", username, restaurantId) > 0;
     }
+
+    /** Distinct restaurant ids the given user has reviewed (across all cities). */
+    public List<String> reviewedRestaurantIds(String username) {
+        return getEntityManager()
+                .createQuery("select distinct r.restaurantId from ReviewEntity r where r.username = ?1",
+                        String.class)
+                .setParameter(1, username)
+                .getResultList();
+    }
 }
