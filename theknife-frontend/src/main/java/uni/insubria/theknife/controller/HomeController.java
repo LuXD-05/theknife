@@ -607,7 +607,15 @@ public class HomeController {
 
         TextField nameField = new TextField();
         TextField addressField = new TextField();
+        
         TextField locationField = new TextField();
+        TextFields.bindAutoCompletion(locationField, param -> {
+            String userText = param.getUserText().toLowerCase();
+            return SessionService.getLocations().stream()
+                    .filter(l -> l.toLowerCase().contains(userText))
+                    .collect(Collectors.toList());
+        });
+
         TextField phoneField = new TextField();
         TextField websiteField = new TextField();
 
@@ -802,6 +810,16 @@ public class HomeController {
         if (locationField.getText() == null || locationField.getText().isBlank()) {
             return "Location is mandatory.";
         }
+        String canonicalLocation = SessionService.getLocations().stream()
+                .filter(l -> l.equalsIgnoreCase(locationField.getText()))
+                .findFirst()
+                .orElse(null);
+        if (canonicalLocation == null || canonicalLocation.isBlank()) {
+            return "Location not found.";
+        }
+        // if (locationField.getText().matches(".*\\d.*")) {
+        //     return "Location cannot contain numbers.";
+        // }
 
         if (locationField.getText().matches(".*\\d.*")) {
             return "Location cannot contain numbers.";
