@@ -11,13 +11,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import uni.insubria.theknife.model.Restaurant;
@@ -29,11 +24,15 @@ import uni.insubria.theknife.repository.ReviewsRepository;
 import uni.insubria.theknife.service.AlertService;
 import uni.insubria.theknife.service.SessionService;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.controlsfx.control.textfield.TextFields;
 
 import javafx.geometry.Insets;
 import uni.insubria.theknife.repository.UserRepository;
@@ -405,8 +404,8 @@ public class RestaurantController {
             setLabelText(addressLabel, restaurant.getAddress());
             setLabelText(priceLabel, restaurant.getPrice());
             setLabelText(cuisineLabel, restaurant.getCuisine());
-            setLabelText(longitudeLabel, restaurant.getLongitude() != 0 ? String.valueOf(restaurant.getLongitude()) : "");
-            setLabelText(latitudeLabel, restaurant.getLatitude() != 0 ? String.valueOf(restaurant.getLatitude()) : "");
+            setLabelText(longitudeLabel, java.util.Optional.ofNullable(restaurant.getLongitude()).map(String::valueOf).orElse("unknown"));
+            setLabelText(latitudeLabel, java.util.Optional.ofNullable(restaurant.getLatitude()).map(String::valueOf).orElse("unknown"));
             setLabelText(phoneLabel, restaurant.getPhone());
             setLabelText(michelinUrlLabel, restaurant.getMichelinUrl());
             setLabelText(websiteUrlLabel, restaurant.getWebsiteUrl());
@@ -1027,7 +1026,15 @@ public class RestaurantController {
         // Create fields pre-filled with current restaurant data
         TextField nameField = new TextField(restaurant.getName());
         TextField addressField = new TextField(restaurant.getAddress());
+        
         TextField locationField = new TextField(restaurant.getLocation());
+        TextFields.bindAutoCompletion(locationField, param -> {
+            String userText = param.getUserText().toLowerCase();
+            return SessionService.getLocations().stream()
+                    .filter(l -> l.toLowerCase().contains(userText))
+                    .collect(Collectors.toList());
+        });
+
         TextField phoneField = new TextField(restaurant.getPhone());
         TextField cuisineField = new TextField(restaurant.getCuisine());
         TextField websiteField = new TextField(restaurant.getWebsiteUrl());
@@ -1089,41 +1096,38 @@ public class RestaurantController {
                         return;
                     }
 
-                    // 1) Location: nessun numero consentito
-                    if (locationField.getText().matches(".*\\d.*")) {
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Location cannot contain numbers.");
+                    //// 1) Location: nessun numero consentito (not needed if autocompletion on)
+                    // if (locationField.getText().matches(".*\\d.*")) {
+                    //     Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Location cannot contain numbers.");
+                    //     errorAlert.showAndWait();
+                    //     return;
+                    // }
+
+                    // 1) Location: must be in autocompletion list
+                    String canonicalLocation = SessionService.getLocations().stream()
+                            .filter(l -> l.equalsIgnoreCase(locationField.getText()))
+                            .findFirst()
+                            .orElse(null);
+                    if (canonicalLocation == null || canonicalLocation.isBlank()) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Location not found.");
                         errorAlert.showAndWait();
                         return;
                     }
 
                     // 2) Latitudine: numero float tra -90 e 90
-                    Float lat = null;
-                    if (latitudeField.getText().isBlank()) {
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Latitude is mandatory.");
+                    Float lat = Float.parseFloat(latitudeField.getText().trim());
+                    if (lat < -90f || lat > 90f) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Latitude must be between -90 and 90.");
                         errorAlert.showAndWait();
                         return;
-                    } else {
-                        lat = Float.parseFloat(latitudeField.getText().trim());
-                        if (lat < -90f || lat > 90f) {
-                            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Latitude must be between -90 and 90.");
-                            errorAlert.showAndWait();
-                            return;
-                        }
                     }
 
                     // 3) Longitudine: numero float tra -180 e 180
-                    Float lon = null;
-                    if (longitudeField.getText().isBlank()) {
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Longitude is mandatory.");
+                    Float lon = Float.parseFloat(longitudeField.getText().trim());
+                    if (lon < -180f || lon > 180f) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Longitude must be between -180 and 180.");
                         errorAlert.showAndWait();
                         return;
-                    } else {
-                        lon = Float.parseFloat(longitudeField.getText().trim());
-                        if (lon < -180f || lon > 180f) {
-                            Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Longitude must be between -180 and 180.");
-                            errorAlert.showAndWait();
-                            return;
-                        }
                     }
 
                     // 4) Numero di telefono internazionale (esempio regex)
