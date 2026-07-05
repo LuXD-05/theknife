@@ -24,3 +24,8 @@ MIGLIORIE DA EFFETTUARE:
         fascia di prezzo da selezionare come le stelle delle recensioni (non string libero) - FATTO
         mancano rb da spuntare per delivery e prenotazione online
         mancano da inserire le facilities
+
+ULTIME COSE CHE MANCANO:
+    problema lista preferiti
+    rb per delivery e prenotazione online
+    facilities (String)
