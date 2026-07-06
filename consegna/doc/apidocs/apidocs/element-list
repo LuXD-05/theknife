@@ -1,0 +1,16 @@
+uni.insubria.theknife
+uni.insubria.theknife.backend.entity
+uni.insubria.theknife.backend.handler
+uni.insubria.theknife.backend.mapper
+uni.insubria.theknife.backend.repository
+uni.insubria.theknife.backend.seed
+uni.insubria.theknife.backend.service
+uni.insubria.theknife.backend.ws
+uni.insubria.theknife.client
+uni.insubria.theknife.common.dto
+uni.insubria.theknife.common.protocol
+uni.insubria.theknife.controller
+uni.insubria.theknife.model
+uni.insubria.theknife.repository
+uni.insubria.theknife.service
+uni.insubria.theknife.util
