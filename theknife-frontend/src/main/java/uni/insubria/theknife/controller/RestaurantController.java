@@ -738,6 +738,9 @@ public class RestaurantController {
             answerLabel.setWrapText(true);
             answerLabel.getStyleClass().add("review-answer");
 
+            // Populate the answer row once; cells are recycled so we must not add these repeatedly.
+            answerBoxRow.getChildren().addAll(answerLabelPrefix, answerLabel);
+
             // Initialize answer components
             answerField = new TextField();
             answerField.setPromptText("Rispondi al cliente...");
@@ -786,8 +789,7 @@ public class RestaurantController {
                 // Handle answer display/input
                 if (review.getAnswer() != null && !review.getAnswer().trim().isEmpty()) {
                     answerLabel.setText(review.getAnswer());
-                    if (!contentBox.getChildren().contains(answerLabel)) {
-                        answerBoxRow.getChildren().addAll(answerLabelPrefix, answerLabel);
+                    if (!contentBox.getChildren().contains(answerBoxRow)) {
                         contentBox.getChildren().add(answerBoxRow);
                     }
                     contentBox.getChildren().remove(answerBox);
