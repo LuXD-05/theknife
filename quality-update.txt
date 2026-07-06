@@ -12,8 +12,8 @@ ELEMENTI DA IMPLEMENTARE PER LAB B:
     3. Gestire comunicazione client-server - FATTO
 
 Problemi da SISTEMARE  
-    1. La lista preferiti restituisce null-null se accedo al mio account dopo aver salvato dei ristoranti in un'altra sessione(Cliente)
-    2. Serve il dropdown nella sezione Location dell'add dei ristoranti (Ristoratore)
-    3. Latitude e Longitude sono stati messi opzionali, ma se li lascio vuoti non vedo la maggior parte degli altri campi (RIS)
-    4. Sarebbe opportuno mettere un hint su Latitude e Longitude per far mettere i valori nel range giusto
-    5. Rimuovere i filtri di ricerca per i ristoratori
+    1. La lista preferiti restituisce null-null se accedo al mio account dopo aver salvato dei ristoranti in un'altra sessione(Cliente) - FATTO
+    2. Serve il dropdown nella sezione Location dell'add dei ristoranti (Ristoratore) - FATTO
+    3. Latitude e Longitude sono stati messi opzionali, ma se li lascio vuoti non vedo la maggior parte degli altri campi (RIS) - FATTO
+    4. Sarebbe opportuno mettere un hint su Latitude e Longitude per far mettere i valori nel range giusto - FATTO
+    5. Rimuovere i filtri di ricerca per i ristoratori - FATTO
