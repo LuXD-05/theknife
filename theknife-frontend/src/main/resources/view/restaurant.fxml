@@ -88,9 +88,9 @@
                     <Label fx:id="averageRatingLabel"/>
                 </HBox>
             </VBox>
-            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
-                <ListView fx:id="reviewsListView" prefWidth="380"/>
-            </ScrollPane>
+
+            <ListView fx:id="reviewsListView" prefWidth="380" VBox.vgrow="ALWAYS"/>
+            
             <VBox fx:id="addReviewBox" spacing="5">
                 <TextField fx:id="reviewContent" promptText="Valuta il ristorante..."/>
                 <ComboBox fx:id="ratingSelector" promptText="Select rating (1-5 stars)"/>

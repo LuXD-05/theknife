@@ -737,6 +737,8 @@ public class RestaurantController {
             answerLabel = new Label();
             answerLabel.setWrapText(true);
             answerLabel.getStyleClass().add("review-answer");
+            answerBoxRow.getChildren().addAll(answerLabelPrefix, answerLabel);
+
 
             // Initialize answer components
             answerField = new TextField();
@@ -787,7 +789,6 @@ public class RestaurantController {
                 if (review.getAnswer() != null && !review.getAnswer().trim().isEmpty()) {
                     answerLabel.setText(review.getAnswer());
                     if (!contentBox.getChildren().contains(answerLabel)) {
-                        answerBoxRow.getChildren().addAll(answerLabelPrefix, answerLabel);
                         contentBox.getChildren().add(answerBoxRow);
                     }
                     contentBox.getChildren().remove(answerBox);
