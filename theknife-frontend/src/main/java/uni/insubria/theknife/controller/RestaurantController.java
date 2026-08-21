@@ -15,7 +15,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import uni.insubria.theknife.model.Restaurant;
 import uni.insubria.theknife.model.Review;
 import uni.insubria.theknife.model.Role;
@@ -738,8 +737,6 @@ public class RestaurantController {
             answerLabel = new Label();
             answerLabel.setWrapText(true);
             answerLabel.getStyleClass().add("review-answer");
-            answerBoxRow.getChildren().addAll(answerLabelPrefix, answerLabel);
-            HBox.setHgrow(answerLabel, Priority.ALWAYS);
 
             // Initialize answer components
             answerField = new TextField();
@@ -752,7 +749,7 @@ public class RestaurantController {
             answerBox = new VBox(5);
             answerBox.getChildren().addAll(answerField, answerButton);
 
-            contentBox.getChildren().addAll(headerBox, contentLabel, answerBoxRow, answerBox);
+            contentBox.getChildren().addAll(headerBox, contentLabel);
 
             // Create action buttons
             actionBox = new HBox(5);
@@ -787,21 +784,29 @@ public class RestaurantController {
                 contentLabel.setText(review.getContent());
 
                 // Handle answer display/input
-                boolean hasAnswer = review.getAnswer() != null && !review.getAnswer().trim().isEmpty();
-                answerLabel.setText(hasAnswer ? review.getAnswer() : "");
-                answerBoxRow.setVisible(hasAnswer);
-                answerBoxRow.setManaged(hasAnswer);
-
-                User currentUser = SessionService.getUserFromSession();
-                boolean canAnswer = currentUser != null && currentUser.getRole() == Role.RISTORATORE && !hasAnswer;
-                answerBox.setVisible(canAnswer);
-                answerBox.setManaged(canAnswer);
+                if (review.getAnswer() != null && !review.getAnswer().trim().isEmpty()) {
+                    answerLabel.setText(review.getAnswer());
+                    if (!contentBox.getChildren().contains(answerLabel)) {
+                        answerBoxRow.getChildren().addAll(answerLabelPrefix, answerLabel);
+                        contentBox.getChildren().add(answerBoxRow);
+                    }
+                    contentBox.getChildren().remove(answerBox);
+                } else {
+                    // Show answer input for restaurant owners
+                    contentBox.getChildren().remove(answerBoxRow);
+                    if (SessionService.getUserFromSession() != null && SessionService.getUserFromSession().getRole() == Role.RISTORATORE) {
+                        if (!contentBox.getChildren().contains(answerBox)) {
+                            contentBox.getChildren().add(answerBox);
+                        }
+                    } else {
+                        contentBox.getChildren().remove(answerBox);
+                    }
+                }
 
                 // Show edit/delete buttons only for the review author
-                String username = SessionService.getUserFromSession() != null ? SessionService.getUserFromSession().getUsername() : null;
-                boolean isAuthor = review.getUser().getUsername().equals(username);
+                String currentUser = SessionService.getUserFromSession() != null ? SessionService.getUserFromSession().getUsername() : null;
+                boolean isAuthor = review.getUser().getUsername().equals(currentUser);
                 actionBox.setVisible(isAuthor);
-                actionBox.setManaged(isAuthor);
 
                 setGraphic(contentBox);
             }
