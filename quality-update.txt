@@ -19,9 +19,10 @@ Problemi da SISTEMARE
     5. Rimuovere i filtri di ricerca per i ristoratori - FATTO
 
 FIX per quarto appello
-    1. Dal profilo cliente non si vedono le risposte alle recensioni
+    1. Dal profilo cliente non si vedono le risposte alle recensioni - FATTO
     2. Migliorie al manuale Tecnico
         a. UML
-            I. Sequence Diagram
-            II. State Diagram
-        b. Schema E-R
+            I. Sequence Diagram - FATTO login, recensioni e riposte
+            II. State Diagram - FATTO connessione
+        b. Scelte Algoritmiche
+    3. Caricare Nuovo M.T. e M.U.
