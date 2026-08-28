@@ -24,5 +24,5 @@ FIX per quarto appello
         a. UML
             I. Sequence Diagram - FATTO login, recensioni e riposte
             II. State Diagram - FATTO connessione
-        b. Scelte Algoritmiche
-    3. Caricare Nuovo M.T. e M.U.
+        b. Scelte Algoritmiche - FATTO
+    3. Caricare Nuovo M.T. e M.U. - FATTO
